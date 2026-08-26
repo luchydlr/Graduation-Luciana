@@ -1,9 +1,9 @@
 # Graduación Luciana
 
-Tarjeta de participación digital para el grado de Ingeniería Electrónica.
+Tarjeta de participación digital para el grado de Ingeniería Electrónica
+de Luciana De la Rosa Padilla — Universidad del Norte, 25 de septiembre de 2026.
 
 - `tarjeta-participacion.html` — tarjeta lista para publicar/compartir.
 
-Los datos pendientes están marcados en el HTML con la clase `ph`
-(universidad, apellidos, fecha, hora, lugar, nombres de los padres y el
-enlace de WhatsApp para confirmar asistencia).
+Pendientes: la hora y el lugar de la ceremonia, marcados en el HTML con
+la clase `ph`.
