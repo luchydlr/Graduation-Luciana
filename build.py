@@ -9,6 +9,7 @@ idénticas: index.html (participación) y cena.html (invitación a la cena).
 Para cambiar el diseño, edita SHELL. Para cambiar los datos, edita PAGINAS.
 """
 import io
+import re
 
 # ── Datos de cada página ─────────────────────────────────────────────────
 PAGINAS = [
@@ -17,11 +18,11 @@ PAGINAS = [
     "titulo":  "Participación de Grado Luciana De la Rosa",
     "eyebrow": "Participación",
     "lead":    "Con la alegría de un camino que se cierra y otro que empieza, "
-               "te invito a acompañarme en mi ceremonia de grado",
-    "closing": "Tu presencia cierra el circuito.",
+               "quiero compartir contigo el día en que recibo mi título",
+    "closing": "Aunque sea a la distancia, cierras el circuito conmigo.",
     "detalles": [
       ("Fecha", "Viernes 25 de septiembre", "de 2026"),
-      ("Hora",  "4:00 p.&nbsp;m.",          "Ingreso 30 minutos antes"),
+      ("Hora",  "4:00 p.&nbsp;m.",          "Hora de Barranquilla (GMT-5)"),
       ("Lugar", "Coliseo Universidad del Norte", "Barranquilla"),
     ],
     "aside": """
@@ -29,9 +30,9 @@ PAGINAS = [
       <p class="note">Si no puedes acompañarme en persona, quiero que estés igual:
       la ceremonia se transmite en vivo y ese día también cuentas.</p>
       <span class="btn pending">Enlace de transmisión pendiente</span>""",
-    "cta_texto": "Confirmar asistencia",
-    "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%20a%20tu%20ceremonia%20de%20grado%20%F0%9F%8E%93",
-    "signoff":   "Traje formal",
+    "cta_texto": None,
+    "cta_msg":   None,
+    "signoff":   None,
   },
   {
     "archivo": "cena.html",
@@ -359,21 +360,21 @@ SHELL = r"""<title>@@TITULO@@</title>
   <div class="frame"></div>
   <span class="via bl"></span><span class="via br"></span>
 
-  <figure class="portrait rise d1">
-    <img src="foto.jpg" alt="Luciana De la Rosa Padilla"
-         onerror="this.parentNode.classList.add('empty'); this.remove();">
-  </figure>
-
-  <header class="institution mono rise d2">
+  <header class="institution mono rise d1">
     <span class="school">Universidad del Norte</span>
     <span class="kind">@@EYEBROW@@</span>
   </header>
 
-  <p class="lead rise d3">@@LEAD@@</p>
+  <p class="lead rise d2">@@LEAD@@</p>
 
   <h1 class="name rise d3">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
-  <svg class="trace rise d4" viewBox="0 0 400 40" role="presentation" aria-hidden="true">
+  <figure class="portrait rise d4">
+    <img src="foto.jpg" alt="Luciana De la Rosa Padilla"
+         onerror="this.parentNode.classList.add('empty'); this.remove();">
+  </figure>
+
+  <svg class="trace rise d5" viewBox="0 0 400 40" role="presentation" aria-hidden="true">
     <path class="t" d="M 6 20 H 84 l 12 -12 H 164 l 12 12 H 188"/>
     <path class="t" d="M 394 20 H 316 l -12 12 H 236 l -12 -12 H 212"/>
     <path class="flow"   d="M 6 20 H 84 l 12 -12 H 164 l 12 12 H 188"/>
@@ -384,9 +385,9 @@ SHELL = r"""<title>@@TITULO@@</title>
     <circle class="core" cx="200" cy="20" r="2.4"/>
   </svg>
 
-  <p class="degree rise d4">Ingeniera Electrónica</p>
+  <p class="degree rise d5">Ingeniera Electrónica</p>
 
-  <figure class="year rise d5">
+  <figure class="year rise d6">
     <svg class="resistor" viewBox="0 0 200 54" role="img" aria-label="El año 2026 escrito en el código de colores de una resistencia: rojo, negro, rojo, azul.">
       <line x1="4" y1="27" x2="46" y2="27" stroke="#A6AEB8" stroke-width="2.2" stroke-linecap="round"/>
       <line x1="154" y1="27" x2="196" y2="27" stroke="#A6AEB8" stroke-width="2.2" stroke-linecap="round"/>
@@ -401,19 +402,16 @@ SHELL = r"""<title>@@TITULO@@</title>
     <figcaption class="mono">Promoción <b>2026</b> · rojo · negro · rojo · azul</figcaption>
   </figure>
 
-  <p class="closing rise d6">@@CLOSING@@</p>
+  <p class="closing rise d7">@@CLOSING@@</p>
 
-  <dl class="details rise d7">
+  <dl class="details rise d8">
 @@DETALLES@@
   </dl>
 
-  <div class="aside rise d8">@@ASIDE@@
+  <div class="aside rise d9">@@ASIDE@@
   </div>
 
-  <a class="btn rise d9" href="@@CTA_HREF@@" target="_blank" rel="noopener">
-    <span class="dot"></span> @@CTA_TEXTO@@
-  </a>
-
+@@CTA@@
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
       <line x1="0" y1="7" x2="103" y2="7"/>
@@ -422,14 +420,21 @@ SHELL = r"""<title>@@TITULO@@</title>
     </svg>
     <p class="mono">Conmigo, siempre</p>
     <div class="remembered">
+      <p><span class="mono rel">Mi abuelo</span><span class="who">Abel Padilla Manga</span></p>
       <p><span class="mono rel">Mi papá</span><span class="who">Manfred Von Lignau</span></p>
-      <p><span class="mono rel">Mi abuelo</span><span class="who">Abel Padilla</span></p>
     </div>
     <p class="note">Ustedes me enseñaron el pulso y la paciencia. Este título lleva su nombre y hoy celebran conmigo.</p>
   </section>
 
-  <p class="mono signoff rise d10">@@SIGNOFF@@</p>
-</main>
+@@SIGNOFF@@</main>
+"""
+
+CTA = """  <a class="btn rise d10" href="%s" target="_blank" rel="noopener">
+    <span class="dot"></span> %s
+  </a>
+"""
+
+SIGNOFF = """  <p class="mono signoff rise d10">%s</p>
 """
 
 ITEM = """    <div class="item">
@@ -441,6 +446,8 @@ ITEM = """    <div class="item">
 def build():
     for pg in PAGINAS:
         detalles = "\n".join(ITEM % d for d in pg["detalles"])
+        cta = CTA % (WHATSAPP + pg["cta_msg"], pg["cta_texto"]) if pg["cta_texto"] else ""
+        signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
             ("@@TITULO@@",    pg["titulo"]),
@@ -449,11 +456,11 @@ def build():
             ("@@CLOSING@@",   pg["closing"]),
             ("@@DETALLES@@",  detalles),
             ("@@ASIDE@@",     pg["aside"].rstrip()),
-            ("@@CTA_HREF@@",  WHATSAPP + pg["cta_msg"]),
-            ("@@CTA_TEXTO@@", pg["cta_texto"]),
-            ("@@SIGNOFF@@",   pg["signoff"]),
+            ("@@CTA@@",     cta),
+            ("@@SIGNOFF@@", signoff),
         ]:
             html = html.replace(token, valor)
+        html = re.sub(r"\n{3,}", "\n\n", html)
         assert "@@" not in html, "quedó un token sin reemplazar en " + pg["archivo"]
         io.open(pg["archivo"], "w", encoding="utf-8").write(html)
         print("escrito", pg["archivo"], len(html), "bytes")
