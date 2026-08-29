@@ -57,11 +57,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(22px, 4vw, 34px);
+    gap: clamp(22px, 4vw, 32px);
     text-align: center;
   }
 
-  /* hairline frame + corner vias */
   .frame{
     position: absolute;
     inset: clamp(10px, 2.4vw, 18px);
@@ -136,13 +135,72 @@
     100% { stroke-dashoffset: -230; opacity: 0; }
   }
 
-  /* ── Details ───────────────────────────────────────── */
+  /* ── Resistor / year ───────────────────────────────── */
+  .year{ display: grid; justify-items: center; gap: .9em; margin: 0; }
+  .resistor{ width: 190px; height: auto; }
+  .year figcaption{ color: var(--muted); }
+  .year figcaption b{ color: var(--copper); font-weight: 500; }
+
+  .closing{
+    margin: 0;
+    max-width: 34ch;
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--copper-lit);
+    text-wrap: balance;
+  }
+
+  .hosts{ margin: 0; max-width: 32ch; color: var(--muted); font-size: var(--step--1); letter-spacing: .06em; line-height: 1.9; }
+  .hosts strong{ display: block; color: var(--paper); font-weight: 400; letter-spacing: .12em; text-transform: uppercase; }
+
+  /* ── Switch (ceremonia / cena) ─────────────────────── */
+  .switch{
+    width: 100%;
+    display: flex;
+    border-top: 1px solid var(--ink-line);
+    border-bottom: 1px solid var(--ink-line);
+  }
+  .switch button{
+    flex: 1;
+    appearance: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    position: relative;
+    padding: 1.15em .5em;
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: var(--step--1);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color .3s ease;
+  }
+  .switch button + button{ border-left: 1px solid var(--ink-line); }
+  .switch button::after{
+    content: "";
+    position: absolute; bottom: -1px; left: 50%; right: 50%; height: 1px;
+    background: var(--copper);
+    transition: left .4s cubic-bezier(.4,0,.2,1), right .4s cubic-bezier(.4,0,.2,1);
+  }
+  .switch button[aria-selected="true"]{ color: var(--copper-lit); }
+  .switch button[aria-selected="true"]::after{ left: 0; right: 0; }
+
+  /* ── Panels ────────────────────────────────────────── */
+  .panel{
+    width: 100%;
+    display: grid;
+    justify-items: center;
+    gap: clamp(22px, 4vw, 30px);
+    animation: rise .55s cubic-bezier(.22,.68,.35,1) both;
+  }
+
   .details{
     width: 100%;
     display: grid;
     gap: clamp(20px, 3.4vw, 28px);
-    padding: clamp(20px, 4vw, 28px) 0;
-    border-top: 1px solid var(--ink-line);
+    padding-bottom: clamp(20px, 4vw, 28px);
     border-bottom: 1px solid var(--ink-line);
   }
   @media (min-width: 520px){
@@ -168,51 +226,63 @@
     margin-top: .35em;
   }
 
-  /* ── Resistor / year ───────────────────────────────── */
-  .year{ display: grid; justify-items: center; gap: .9em; }
-  .resistor{ width: 190px; height: auto; }
-  .year figcaption{ color: var(--muted); }
-  .year figcaption b{ color: var(--copper); font-weight: 500; }
+  .aside{ display: grid; justify-items: center; gap: .85em; }
+  .note{ margin: 0; max-width: 36ch; color: var(--muted); font-size: var(--step--1); line-height: 1.85; }
+  .aside .mono{ color: var(--patina); }
 
-  /* ── Closing + CTA ─────────────────────────────────── */
-  .closing{
-    margin: 0;
-    max-width: 34ch;
-    font-family: "Bodoni Moda", "Didot", serif;
-    font-style: italic;
-    font-size: var(--step-1);
-    line-height: 1.5;
-    color: var(--copper-lit);
-    text-wrap: balance;
-  }
-  .hosts{ margin: 0; max-width: 32ch; color: var(--muted); font-size: var(--step--1); letter-spacing: .06em; line-height: 1.9; }
-  .hosts strong{ display: block; color: var(--paper); font-weight: 400; letter-spacing: .12em; text-transform: uppercase; font-size: var(--step--1); }
-
-  .rsvp{
+  /* ── Buttons ───────────────────────────────────────── */
+  .btn{
     display: inline-flex; align-items: center; gap: .8em;
     padding: .95em 2.1em;
     border: 1px solid var(--copper);
     color: var(--copper-lit);
     text-decoration: none;
-    font-family: "IBM Plex Mono", monospace;
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
     font-size: var(--step--1);
-    letter-spacing: .2em;
+    letter-spacing: .18em;
     text-transform: uppercase;
     background: transparent;
     transition: background .35s ease, color .35s ease, box-shadow .35s ease;
   }
-  .rsvp:hover, .rsvp:focus-visible{
+  a.btn:hover, a.btn:focus-visible{
     background: var(--copper);
     color: #10171C;
     box-shadow: 0 0 30px -8px rgba(201,136,80,.75);
   }
-  .rsvp .dot{ width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .btn .dot{ width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .btn.pending{
+    border-style: dashed;
+    border-color: rgba(110,154,148,.55);
+    color: var(--patina);
+    cursor: default;
+  }
+
+  /* ── En memoria ────────────────────────────────────── */
+  .memoriam{
+    display: grid;
+    justify-items: center;
+    gap: 1em;
+    padding-top: clamp(6px, 2vw, 12px);
+  }
+  .memoriam .rule{ width: min(100%, 220px); height: auto; display: block; }
+  .memoriam .rule line{ stroke: rgba(201,136,80,.32); stroke-width: 1; }
+  .memoriam .rule circle{ fill: none; stroke: var(--copper); stroke-width: 1.2; }
+  .memoriam .names{
+    margin: 0;
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--paper);
+    text-wrap: balance;
+  }
+  .memoriam .names span{ display: block; }
 
   .signoff{ color: var(--muted); letter-spacing: .28em; }
 
-  a:focus-visible, .plate :focus-visible{ outline: 2px solid var(--copper-lit); outline-offset: 4px; }
+  a:focus-visible, button:focus-visible{ outline: 2px solid var(--copper-lit); outline-offset: 4px; }
 
-  /* placeholder marks — reemplazar con los datos reales */
+  /* datos por confirmar */
   .ph{ color: var(--patina); border-bottom: 1px dotted rgba(110,154,148,.65); }
 
   /* ── Entrance ──────────────────────────────────────── */
@@ -223,9 +293,9 @@
   .d9{animation-delay:1.35s}.d10{animation-delay:1.5s}
 
   @media (prefers-reduced-motion: reduce){
-    .rise{ opacity: 1; transform: none; animation: none; }
+    .rise, .panel{ opacity: 1; transform: none; animation: none; }
     .trace .flow{ animation: none; opacity: .9; stroke-dasharray: none; }
-    .rsvp{ transition: none; }
+    .btn, .switch button, .switch button::after{ transition: none; }
   }
 </style>
 
@@ -238,7 +308,7 @@
     <span>División de Ingenierías</span>
   </header>
 
-  <p class="lead rise d2">Con la alegría de un camino que se cierra y otro que empieza, te invito a acompañarme en mi ceremonia de grado</p>
+  <p class="lead rise d2">Con la alegría de un camino que se cierra y otro que empieza, te invito a acompañarme en mi grado</p>
 
   <h1 class="name rise d3">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
@@ -270,28 +340,115 @@
     <figcaption class="mono">Promoción <b>2026</b> · rojo · negro · rojo · azul</figcaption>
   </figure>
 
-  <dl class="details rise d6">
-    <div class="item">
-      <dt class="mono">Fecha</dt>
-      <dd>Viernes 25 de septiembre<small>de 2026</small></dd>
+  <p class="closing rise d6">Tu presencia cierra el circuito.</p>
+
+  <div class="switch rise d7" role="tablist" aria-label="Elige qué quieres ver">
+    <button type="button" role="tab" id="tab-ceremonia" aria-controls="panel-ceremonia" aria-selected="true">La ceremonia</button>
+    <button type="button" role="tab" id="tab-cena" aria-controls="panel-cena" aria-selected="false" tabindex="-1">La cena</button>
+  </div>
+
+  <section class="panel" id="panel-ceremonia" role="tabpanel" aria-labelledby="tab-ceremonia">
+    <dl class="details">
+      <div class="item">
+        <dt class="mono">Fecha</dt>
+        <dd>Viernes 25 de septiembre<small>de 2026</small></dd>
+      </div>
+      <div class="item">
+        <dt class="mono">Hora</dt>
+        <dd class="ph">0:00 p. m.<small>Ingreso 30 minutos antes</small></dd>
+      </div>
+      <div class="item">
+        <dt class="mono">Lugar</dt>
+        <dd class="ph">Auditorio<small>Dirección · Barranquilla</small></dd>
+      </div>
+    </dl>
+
+    <div class="aside">
+      <p class="mono">A la distancia</p>
+      <p class="note">Si no puedes acompañarme en persona, quiero que estés igual: la ceremonia se transmite en vivo y ese día también cuentas.</p>
+      <span class="btn pending">Enlace de transmisión pendiente</span>
     </div>
-    <div class="item">
-      <dt class="mono">Hora</dt>
-      <dd class="ph">0:00 p. m.<small>Ingreso 30 minutos antes</small></dd>
+
+    <a class="btn" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%20a%20tu%20ceremonia%20de%20grado%20%F0%9F%8E%93" target="_blank" rel="noopener">
+      <span class="dot"></span> Confirmar asistencia
+    </a>
+  </section>
+
+  <section class="panel" id="panel-cena" role="tabpanel" aria-labelledby="tab-cena" hidden>
+    <p class="hosts"><strong>Invita</strong>Milena Padilla</p>
+
+    <dl class="details">
+      <div class="item">
+        <dt class="mono">Fecha</dt>
+        <dd>Viernes 25 de septiembre<small>de 2026</small></dd>
+      </div>
+      <div class="item">
+        <dt class="mono">Hora</dt>
+        <dd>8:00 p. m.</dd>
+      </div>
+      <div class="item">
+        <dt class="mono">Lugar</dt>
+        <dd>Rincón del Viejo Country<small class="ph">Dirección · Barranquilla</small></dd>
+      </div>
+    </dl>
+
+    <div class="aside">
+      <p class="note">Después de la ceremonia nos sentamos a celebrar sin prisa. Me encantaría tenerte en la mesa.</p>
     </div>
-    <div class="item">
-      <dt class="mono">Lugar</dt>
-      <dd class="ph">Auditorio<small>Dirección · Ciudad</small></dd>
-    </div>
-  </dl>
 
-  <p class="hosts rise d7"><strong>Junto a mi mamá</strong>Milena Padilla</p>
+    <a class="btn" href="https://wa.me/573215699335?text=%C2%A1Hola%21%20Confirmo%20mi%20asistencia%20a%20la%20cena%20de%20grado%20de%20Luciana%20%F0%9F%A5%82" target="_blank" rel="noopener">
+      <span class="dot"></span> Confirmar asistencia
+    </a>
+  </section>
 
-  <p class="closing rise d8">Tu presencia cierra el circuito.</p>
+  <section class="memoriam rise d8">
+    <svg class="rule" viewBox="0 0 200 14" role="presentation" aria-hidden="true">
+      <line x1="0" y1="7" x2="88" y2="7"/>
+      <line x1="112" y1="7" x2="200" y2="7"/>
+      <circle cx="100" cy="7" r="4.5"/>
+    </svg>
+    <p class="mono">En memoria</p>
+    <p class="names">
+      <span class="ph">Nombre de tu papá</span>
+      <span class="ph">Nombre de tu abuelo</span>
+    </p>
+    <p class="note">Este título también es suyo. Me trajeron hasta aquí y hoy los llevo conmigo.</p>
+  </section>
 
-  <a class="rsvp rise d9" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%20a%20tu%20grado%20%F0%9F%8E%93" target="_blank" rel="noopener">
-    <span class="dot"></span> Confirmar asistencia
-  </a>
-
-  <p class="mono signoff rise d10">Traje formal · Cupo limitado</p>
+  <p class="mono signoff rise d9">Traje formal · Cupo limitado</p>
 </main>
+
+<script>
+  (function(){
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+    function select(tab, focus){
+      tabs.forEach(function(t){
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(t.getAttribute('aria-controls'));
+        panel.hidden = !on;
+        if (on) {
+          // reinicia la animación de entrada del panel
+          panel.style.animation = 'none';
+          void panel.offsetWidth;
+          panel.style.animation = '';
+        }
+      });
+      if (focus) tab.focus();
+    }
+
+    tabs.forEach(function(tab, i){
+      tab.addEventListener('click', function(){ select(tab); });
+      tab.addEventListener('keydown', function(e){
+        var next = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = tabs[(i + 1) % tabs.length];
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   next = tabs[(i - 1 + tabs.length) % tabs.length];
+        if (e.key === 'Home') next = tabs[0];
+        if (e.key === 'End')  next = tabs[tabs.length - 1];
+        if (next) { e.preventDefault(); select(next, true); }
+      });
+    });
+  })();
+</script>
