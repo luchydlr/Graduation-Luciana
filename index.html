@@ -66,36 +66,51 @@
     text-align: center;
   }
 
+  /* El ángulo se registra para poder animarlo; si el navegador no soporta
+     @property, el degradé queda quieto en vez de romperse. */
+  @property --ang{ syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+
   .frame{
     position: absolute;
     inset: clamp(9px, 2.2vw, 17px);
     pointer-events: none;
-    border: 1px solid rgba(223,168,140,.38);
-    animation: respirar 7s ease-in-out infinite;
-  }
-  @keyframes respirar{
-    0%, 100% { border-color: rgba(223,168,140,.34); }
-    50%      { border-color: rgba(242,176,194,.66); }
+    border: 1px solid rgba(223,168,140,.34);
   }
 
-  /* chispa que recorre el borde, como corriente por la pista */
-  .spark{
+  /* Dos luces recorren el contorno en sentidos opuestos: una por el borde
+     de la tarjeta y otra, más tenue, por el hilo interior. */
+  .sweep{
     position: absolute;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--rose-pale);
-    box-shadow: 0 0 12px 3px rgba(242,176,194,.7);
-    animation: recorrer 11s linear infinite;
+    inset: -1px;
+    padding: 1px;
+    pointer-events: none;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: girar 9s linear infinite;
   }
-  /* los porcentajes van pesados por el largo de cada lado, para que la
-     chispa no acelere en los lados cortos */
-  @keyframes recorrer{
-    0%   { top: -4px; left: -4px; }
-    17%  { top: -4px; left: calc(100% - 3px); }
-    50%  { top: calc(100% - 3px); left: calc(100% - 3px); }
-    67%  { top: calc(100% - 3px); left: -4px; }
-    100% { top: -4px; left: -4px; }
+  .plate > .sweep{
+    background: conic-gradient(from var(--ang),
+      transparent 0deg 190deg,
+      rgba(210,131,156,.35) 258deg,
+      var(--rose) 306deg,
+      var(--rose-pale) 330deg,
+      var(--rose) 344deg,
+      transparent 360deg);
   }
+  .frame > .sweep{
+    background: conic-gradient(from var(--ang),
+      transparent 0deg 214deg,
+      rgba(223,168,140,.45) 286deg,
+      var(--rose-pale) 322deg,
+      transparent 352deg);
+    animation-duration: 14s;
+    animation-direction: reverse;
+    opacity: .8;
+  }
+  @keyframes girar{ to{ --ang: 360deg; } }
+
   .frame::before, .frame::after,
   .via{ content: ""; position: absolute; width: 9px; height: 9px; border-radius: 50%;
         background: var(--plate); border: 1px solid var(--gold); }
@@ -201,7 +216,7 @@
 
   /* ── Año en código de resistencia ──────────────────── */
   .year{ display: grid; justify-items: center; gap: .85em; margin: 0; }
-  .resistor{ width: 186px; height: auto; }
+  .resistor{ width: 200px; height: auto; }
   .year figcaption{ color: var(--muted); }
   .year figcaption b{ color: var(--rose); font-weight: 500; }
 
@@ -328,14 +343,14 @@
   @media (prefers-reduced-motion: reduce){
     .rise{ opacity: 1; transform: none; animation: none; }
     .trace .flow{ animation: none; opacity: .9; stroke-dasharray: none; }
-    .frame{ animation: none; }
-    .spark{ display: none; }
+    .sweep{ animation: none; opacity: .5; }
     .btn{ transition: none; }
   }
 </style>
 
 <main class="plate">
-  <div class="frame"><span class="spark"></span></div>
+  <span class="sweep"></span>
+  <div class="frame"><span class="sweep"></span></div>
   <span class="via bl"></span><span class="via br"></span>
 
   <header class="institution mono rise d1">
@@ -366,16 +381,42 @@
   <p class="degree rise d5">Ingeniera Electrónica</p>
 
   <figure class="year rise d6">
-    <svg class="resistor" viewBox="0 0 200 54" role="img" aria-label="El año 2026 escrito en el código de colores de una resistencia: rojo, negro, rojo, azul.">
-      <line x1="4" y1="27" x2="46" y2="27" stroke="#A6AEB8" stroke-width="2.2" stroke-linecap="round"/>
-      <line x1="154" y1="27" x2="196" y2="27" stroke="#A6AEB8" stroke-width="2.2" stroke-linecap="round"/>
-      <rect x="46" y="11" width="108" height="32" rx="15" fill="#E4CBBD"/>
-      <rect x="46" y="11" width="108" height="32" rx="15" fill="none" stroke="rgba(11,14,19,.35)" stroke-width="1"/>
-      <rect x="60"  y="11" width="9" height="32" fill="#A81F1C"/>
-      <rect x="78"  y="11" width="9" height="32" fill="#151B1F"/>
-      <rect x="96"  y="11" width="9" height="32" fill="#A81F1C"/>
-      <rect x="114" y="11" width="9" height="32" fill="#2A5C9E"/>
-      <rect x="140" y="11" width="7" height="32" fill="#DFA88C"/>
+    <svg class="resistor" viewBox="0 0 220 60" role="img" aria-label="El año 2026 escrito en el código de colores de una resistencia: rojo, negro, rojo, azul, y banda dorada de tolerancia.">
+      <defs>
+        <linearGradient id="cuerpo" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#F2DFCA"/>
+          <stop offset="45%"  stop-color="#E0C4A6"/>
+          <stop offset="100%" stop-color="#B9997B"/>
+        </linearGradient>
+        <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#FFFFFF" stop-opacity=".42"/>
+          <stop offset="26%"  stop-color="#FFFFFF" stop-opacity="0"/>
+          <stop offset="70%"  stop-color="#000000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity=".30"/>
+        </linearGradient>
+        <clipPath id="barril">
+          <rect x="58" y="12" width="104" height="36" rx="9"/>
+        </clipPath>
+      </defs>
+
+      <line x1="8"   y1="30" x2="52"  y2="30" stroke="#AEB6C0" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="168" y1="30" x2="212" y2="30" stroke="#AEB6C0" stroke-width="2.6" stroke-linecap="round"/>
+
+      <rect x="48"  y="18" width="15" height="24" rx="5" fill="url(#cuerpo)"/>
+      <rect x="157" y="18" width="15" height="24" rx="5" fill="url(#cuerpo)"/>
+
+      <rect x="58" y="12" width="104" height="36" rx="9" fill="url(#cuerpo)"/>
+
+      <g clip-path="url(#barril)">
+        <rect x="70"  y="12" width="10" height="36" fill="#B62025"/>
+        <rect x="88"  y="12" width="10" height="36" fill="#1C1C1E"/>
+        <rect x="106" y="12" width="10" height="36" fill="#B62025"/>
+        <rect x="124" y="12" width="10" height="36" fill="#2E5FA3"/>
+        <rect x="146" y="12" width="9"  height="36" fill="#C8A02E"/>
+        <rect x="58"  y="12" width="104" height="36" fill="url(#brillo)"/>
+      </g>
+
+      <rect x="58" y="12" width="104" height="36" rx="9" fill="none" stroke="rgba(11,14,19,.38)" stroke-width="1"/>
     </svg>
     <figcaption class="mono">Promoción <b>2026</b> · rojo · negro · rojo · azul</figcaption>
   </figure>
@@ -410,7 +451,7 @@
       <line x1="127" y1="7" x2="230" y2="7"/>
       <circle cx="115" cy="7" r="4.5"/>
     </svg>
-    <p class="mono">Conmigo, siempre</p>
+    <p class="mono">Conmigo siempre</p>
     <div class="remembered">
       <p><span class="mono rel">Mi abuelo</span><span class="who">Abel Padilla Manga</span></p>
       <p><span class="mono rel">Mi papá</span><span class="who">Manfred Von Lignau</span></p>
