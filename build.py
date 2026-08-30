@@ -456,7 +456,7 @@ SHELL = r"""<title>@@TITULO@@</title>
       <line x1="127" y1="7" x2="230" y2="7"/>
       <circle cx="115" cy="7" r="4.5"/>
     </svg>
-    <p class="mono">Conmigo, siempre</p>
+    <p class="mono">Conmigo siempre</p>
     <div class="remembered">
       <p><span class="mono rel">Mi abuelo</span><span class="who">Abel Padilla Manga</span></p>
       <p><span class="mono rel">Mi papá</span><span class="who">Manfred Von Lignau</span></p>
