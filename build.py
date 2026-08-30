@@ -10,14 +10,19 @@ Para cambiar el diseño, edita SHELL. Para cambiar los datos, edita PAGINAS.
 """
 import io
 import re
+from urllib.parse import quote
 
 # ── Datos de cada página ─────────────────────────────────────────────────
 PAGINAS = [
   {
     "archivo": "index.html",
     "titulo":  "Participación de Grado Luciana De la Rosa",
+    "icono":   "\U0001F393",
+    "desc":    "Ceremonia de grado de Luciana De la Rosa Padilla, Ingeniera "
+               "Electrónica. Viernes 25 de septiembre de 2026, 4:00 p. m., "
+               "Coliseo Universidad del Norte.",
     "eyebrow": "Participación",
-    "lead":    "Con la alegría de un camino que se cierra y otro que empieza, "
+    "lead":    "Con la alegría de una etapa que se cierra y otra que empieza, "
                "quiero compartir contigo el día en que recibo mi título",
     "closing": "Aunque sea a la distancia, cierras el circuito conmigo.",
     "detalles": [
@@ -25,6 +30,7 @@ PAGINAS = [
       ("Hora",  "4:00 p.&nbsp;m.",          "Hora de Barranquilla (GMT-5)"),
       ("Lugar", "Coliseo Universidad del Norte", "Barranquilla"),
     ],
+    "madre":   "Mi madre",
     "aside": """
       <p class="mono label">A la distancia</p>
       <p class="note">Si no puedes acompañarme en persona, quiero que estés igual:
@@ -37,6 +43,9 @@ PAGINAS = [
   {
     "archivo": "cena.html",
     "titulo":  "Cena de Grado Luciana De la Rosa",
+    "icono":   "\U0001F942",
+    "desc":    "Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de "
+               "septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.",
     "eyebrow": "Cena de grado",
     "lead":    "Al cerrar la ceremonia quiero seguir celebrando contigo. "
                "Te esperamos en nuestra mesa para brindar juntos",
@@ -46,20 +55,29 @@ PAGINAS = [
       ("Hora",  "8:00 p.&nbsp;m.",          "Después de la ceremonia"),
       ("Lugar", "Rincón del Viejo Country", "Country Club Barranquilla"),
     ],
-    "aside": """
-      <p class="mono label">Invita mi madre</p>
-      <p class="host">Milena Padilla</p>
-      <p class="note">Ella caminó conmigo cada semestre de esta carrera. Esta noche quiere agradecerte por acompañarnos.</p>""",
-    "cta_texto": "Cuenta conmigo",
-    "cta_msg":   "%C2%A1Hola%20Luciana%21%20Cuenta%20conmigo%20para%20la%20cena.%20Ah%C3%AD%20estar%C3%A9%20para%20celebrar%20contigo%20%F0%9F%A5%82",
+    "madre":   "Invita mi madre",
+    "aside":   None,
+    "cta_texto": "Confirmar asistencia",
+    "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
     "signoff":   "Traje formal · Cupo limitado",
   },
 ]
 
 WHATSAPP = "https://wa.me/573215699335?text="
 
+# El icono de la pestaña: un emoji dentro de un SVG, incrustado en el HTML.
+SVG_ICONO = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
+             "<text y='.92em' font-size='92'>%s</text></svg>")
+ICONO = "data:image/svg+xml,%s"
+
 # ── Plantilla común ──────────────────────────────────────────────────────
 SHELL = r"""<title>@@TITULO@@</title>
+<link rel="icon" href="@@ICONO@@">
+<meta name="description" content="@@DESC@@">
+<meta name="theme-color" content="#0B0E13">
+<meta property="og:type" content="website">
+<meta property="og:title" content="@@TITULO@@">
+<meta property="og:description" content="@@DESC@@">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">
@@ -127,50 +145,46 @@ SHELL = r"""<title>@@TITULO@@</title>
     text-align: center;
   }
 
-  /* El ángulo se registra para poder animarlo; si el navegador no soporta
-     @property, el degradé queda quieto en vez de romperse. */
-  @property --ang{ syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-
   .frame{
     position: absolute;
     inset: clamp(9px, 2.2vw, 17px);
     pointer-events: none;
     border: 1px solid rgba(223,168,140,.34);
+    animation: respirar 9s ease-in-out infinite;
+  }
+  @keyframes respirar{
+    0%, 100% { border-color: rgba(223,168,140,.30); }
+    50%      { border-color: rgba(242,176,194,.60); }
   }
 
-  /* Dos luces recorren el contorno en sentidos opuestos: una por el borde
-     de la tarjeta y otra, más tenue, por el hilo interior. */
-  .sweep{
+  /* Varias bolitas recorren el contorno a velocidades distintas, unas en
+     un sentido y otras en el contrario, para que nunca se repita el cruce. */
+  .bolita{
     position: absolute;
-    inset: -1px;
-    padding: 1px;
-    pointer-events: none;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    animation: girar 9s linear infinite;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--rose-pale);
+    box-shadow:
+      0 0 8px 2px rgba(242,176,194,.9),
+      0 0 20px 7px rgba(210,131,156,.4);
+    animation: vuelta 10s linear infinite;
   }
-  .plate > .sweep{
-    background: conic-gradient(from var(--ang),
-      transparent 0deg 190deg,
-      rgba(210,131,156,.35) 258deg,
-      var(--rose) 306deg,
-      var(--rose-pale) 330deg,
-      var(--rose) 344deg,
-      transparent 360deg);
+  /* Los porcentajes van pesados por el largo de cada lado, para que no
+     acelere al pasar por los lados cortos. */
+  @keyframes vuelta{
+    0%   { top: -4px; left: -4px; }
+    17%  { top: -4px; left: calc(100% - 3px); }
+    50%  { top: calc(100% - 3px); left: calc(100% - 3px); }
+    67%  { top: calc(100% - 3px); left: -4px; }
+    100% { top: -4px; left: -4px; }
   }
-  .frame > .sweep{
-    background: conic-gradient(from var(--ang),
-      transparent 0deg 214deg,
-      rgba(223,168,140,.45) 286deg,
-      var(--rose-pale) 322deg,
-      transparent 352deg);
-    animation-duration: 14s;
-    animation-direction: reverse;
-    opacity: .8;
-  }
-  @keyframes girar{ to{ --ang: 360deg; } }
+  .f1{ animation-duration: 8.5s; animation-delay: -2.3s; }
+  .f2{ animation-duration: 11.5s; animation-delay: -7.8s; animation-direction: reverse;
+       width: 5px; height: 5px; opacity: .9; }
+  .f3{ animation-duration: 14s;   animation-delay: -10.1s; width: 6px; height: 6px; }
+  .p1{ animation-duration: 10.4s; animation-delay: -5.0s; animation-direction: reverse;
+       width: 6px; height: 6px; opacity: .85; }
+  .p2{ animation-duration: 15.2s; animation-delay: -12.4s; width: 5px; height: 5px; opacity: .75; }
 
   .frame::before, .frame::after,
   .via{ content: ""; position: absolute; width: 9px; height: 9px; border-radius: 50%;
@@ -277,7 +291,7 @@ SHELL = r"""<title>@@TITULO@@</title>
 
   /* ── Año en código de resistencia ──────────────────── */
   .year{ display: grid; justify-items: center; gap: .85em; margin: 0; }
-  .resistor{ width: 200px; height: auto; }
+  .resistor{ width: 192px; height: auto; }
   .year figcaption{ color: var(--muted); }
   .year figcaption b{ color: var(--rose); font-weight: 500; }
 
@@ -404,14 +418,17 @@ SHELL = r"""<title>@@TITULO@@</title>
   @media (prefers-reduced-motion: reduce){
     .rise{ opacity: 1; transform: none; animation: none; }
     .trace .flow{ animation: none; opacity: .9; stroke-dasharray: none; }
-    .sweep{ animation: none; opacity: .5; }
+    .frame{ animation: none; }
+    .bolita{ display: none; }
     .btn{ transition: none; }
   }
 </style>
 
 <main class="plate">
-  <span class="sweep"></span>
-  <div class="frame"><span class="sweep"></span></div>
+  <span class="bolita p1"></span><span class="bolita p2"></span>
+  <div class="frame">
+    <span class="bolita f1"></span><span class="bolita f2"></span><span class="bolita f3"></span>
+  </div>
   <span class="via bl"></span><span class="via br"></span>
 
   <header class="institution mono rise d1">
@@ -442,44 +459,31 @@ SHELL = r"""<title>@@TITULO@@</title>
   <p class="degree rise d5">Ingeniera Electrónica</p>
 
   <figure class="year rise d6">
-    <svg class="resistor" viewBox="0 0 220 60" role="img" aria-label="El año 2026 escrito en el código de colores de una resistencia: rojo, negro, rojo, azul, y banda dorada de tolerancia.">
+    <svg class="resistor" viewBox="0 0 220 60" role="img" aria-label="Una resistencia dibujada a línea con cuatro bandas; la primera y la tercera son del mismo tono, como los dos doses de 2026.">
       <defs>
-        <linearGradient id="cuerpo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#F2DFCA"/>
-          <stop offset="45%"  stop-color="#E0C4A6"/>
-          <stop offset="100%" stop-color="#B9997B"/>
-        </linearGradient>
-        <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#FFFFFF" stop-opacity=".42"/>
-          <stop offset="26%"  stop-color="#FFFFFF" stop-opacity="0"/>
-          <stop offset="70%"  stop-color="#000000" stop-opacity="0"/>
-          <stop offset="100%" stop-color="#000000" stop-opacity=".30"/>
-        </linearGradient>
         <clipPath id="barril">
-          <rect x="58" y="12" width="104" height="36" rx="9"/>
+          <rect x="58" y="14" width="104" height="32" rx="16"/>
         </clipPath>
       </defs>
 
-      <line x1="8"   y1="30" x2="52"  y2="30" stroke="#AEB6C0" stroke-width="2.6" stroke-linecap="round"/>
-      <line x1="168" y1="30" x2="212" y2="30" stroke="#AEB6C0" stroke-width="2.6" stroke-linecap="round"/>
-
-      <rect x="48"  y="18" width="15" height="24" rx="5" fill="url(#cuerpo)"/>
-      <rect x="157" y="18" width="15" height="24" rx="5" fill="url(#cuerpo)"/>
-
-      <rect x="58" y="12" width="104" height="36" rx="9" fill="url(#cuerpo)"/>
-
-      <g clip-path="url(#barril)">
-        <rect x="70"  y="12" width="10" height="36" fill="#B62025"/>
-        <rect x="88"  y="12" width="10" height="36" fill="#1C1C1E"/>
-        <rect x="106" y="12" width="10" height="36" fill="#B62025"/>
-        <rect x="124" y="12" width="10" height="36" fill="#2E5FA3"/>
-        <rect x="146" y="12" width="9"  height="36" fill="#C8A02E"/>
-        <rect x="58"  y="12" width="104" height="36" fill="url(#brillo)"/>
+      <g fill="none" stroke="var(--gold)" stroke-width="1.4" stroke-linecap="round">
+        <line x1="14" y1="30" x2="58"  y2="30"/>
+        <line x1="162" y1="30" x2="206" y2="30"/>
+        <circle cx="10"  cy="30" r="3.2"/>
+        <circle cx="210" cy="30" r="3.2"/>
       </g>
 
-      <rect x="58" y="12" width="104" height="36" rx="9" fill="none" stroke="rgba(11,14,19,.38)" stroke-width="1"/>
+      <g clip-path="url(#barril)">
+        <rect x="80"  y="14" width="6" height="32" fill="var(--rose-deep)"/>
+        <rect x="98"  y="14" width="6" height="32" fill="var(--rose-pale)"/>
+        <rect x="116" y="14" width="6" height="32" fill="var(--rose-deep)"/>
+        <rect x="134" y="14" width="6" height="32" fill="var(--gold)"/>
+      </g>
+
+      <rect x="58" y="14" width="104" height="32" rx="16"
+            fill="none" stroke="var(--gold)" stroke-width="1.4"/>
     </svg>
-    <figcaption class="mono">Promoción <b>2026</b> · rojo · negro · rojo · azul</figcaption>
+    <figcaption class="mono">Promoción <b>2026</b></figcaption>
   </figure>
 
   <p class="closing rise d7">@@CLOSING@@</p>
@@ -488,9 +492,7 @@ SHELL = r"""<title>@@TITULO@@</title>
 @@DETALLES@@
   </dl>
 
-  <div class="aside rise d9">@@ASIDE@@
-  </div>
-
+@@MADRE@@@@ASIDE@@
 @@CTA@@
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
@@ -507,6 +509,20 @@ SHELL = r"""<title>@@TITULO@@</title>
   </section>
 
 @@SIGNOFF@@</main>
+"""
+
+DEDICATORIA = "Ella caminó conmigo cada semestre de esta carrera. Nada de \
+esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos."
+
+MADRE = """  <div class="aside rise d9">
+    <p class="mono label">%s</p>
+    <p class="host">Milena Padilla</p>
+    <p class="note">%s</p>
+  </div>
+"""
+
+ASIDE = """  <div class="aside rise d9">%s
+  </div>
 """
 
 CTA = """  <a class="btn rise d10" href="%s" target="_blank" rel="noopener">
@@ -526,16 +542,22 @@ ITEM = """    <div class="item">
 def build():
     for pg in PAGINAS:
         detalles = "\n".join(ITEM % d for d in pg["detalles"])
+        icono = ICONO % quote(SVG_ICONO % pg["icono"])
+        madre = MADRE % (pg["madre"], DEDICATORIA)
+        aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
         cta = CTA % (WHATSAPP + pg["cta_msg"], pg["cta_texto"]) if pg["cta_texto"] else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
+            ("@@ICONO@@",     icono),
+            ("@@DESC@@",      pg["desc"]),
             ("@@TITULO@@",    pg["titulo"]),
             ("@@EYEBROW@@",   pg["eyebrow"]),
             ("@@LEAD@@",      pg["lead"]),
             ("@@CLOSING@@",   pg["closing"]),
             ("@@DETALLES@@",  detalles),
-            ("@@ASIDE@@",     pg["aside"].rstrip()),
+            ("@@MADRE@@",     madre),
+            ("@@ASIDE@@",     aside),
             ("@@CTA@@",     cta),
             ("@@SIGNOFF@@", signoff),
         ]:

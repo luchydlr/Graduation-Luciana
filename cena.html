@@ -1,4 +1,10 @@
 <title>Cena de Grado Luciana De la Rosa</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ctext%20y%3D%27.92em%27%20font-size%3D%2792%27%3E%F0%9F%A5%82%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.">
+<meta name="theme-color" content="#0B0E13">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cena de Grado Luciana De la Rosa">
+<meta property="og:description" content="Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">
@@ -66,50 +72,46 @@
     text-align: center;
   }
 
-  /* El ángulo se registra para poder animarlo; si el navegador no soporta
-     @property, el degradé queda quieto en vez de romperse. */
-  @property --ang{ syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-
   .frame{
     position: absolute;
     inset: clamp(9px, 2.2vw, 17px);
     pointer-events: none;
     border: 1px solid rgba(223,168,140,.34);
+    animation: respirar 9s ease-in-out infinite;
+  }
+  @keyframes respirar{
+    0%, 100% { border-color: rgba(223,168,140,.30); }
+    50%      { border-color: rgba(242,176,194,.60); }
   }
 
-  /* Dos luces recorren el contorno en sentidos opuestos: una por el borde
-     de la tarjeta y otra, más tenue, por el hilo interior. */
-  .sweep{
+  /* Varias bolitas recorren el contorno a velocidades distintas, unas en
+     un sentido y otras en el contrario, para que nunca se repita el cruce. */
+  .bolita{
     position: absolute;
-    inset: -1px;
-    padding: 1px;
-    pointer-events: none;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    animation: girar 9s linear infinite;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--rose-pale);
+    box-shadow:
+      0 0 8px 2px rgba(242,176,194,.9),
+      0 0 20px 7px rgba(210,131,156,.4);
+    animation: vuelta 10s linear infinite;
   }
-  .plate > .sweep{
-    background: conic-gradient(from var(--ang),
-      transparent 0deg 190deg,
-      rgba(210,131,156,.35) 258deg,
-      var(--rose) 306deg,
-      var(--rose-pale) 330deg,
-      var(--rose) 344deg,
-      transparent 360deg);
+  /* Los porcentajes van pesados por el largo de cada lado, para que no
+     acelere al pasar por los lados cortos. */
+  @keyframes vuelta{
+    0%   { top: -4px; left: -4px; }
+    17%  { top: -4px; left: calc(100% - 3px); }
+    50%  { top: calc(100% - 3px); left: calc(100% - 3px); }
+    67%  { top: calc(100% - 3px); left: -4px; }
+    100% { top: -4px; left: -4px; }
   }
-  .frame > .sweep{
-    background: conic-gradient(from var(--ang),
-      transparent 0deg 214deg,
-      rgba(223,168,140,.45) 286deg,
-      var(--rose-pale) 322deg,
-      transparent 352deg);
-    animation-duration: 14s;
-    animation-direction: reverse;
-    opacity: .8;
-  }
-  @keyframes girar{ to{ --ang: 360deg; } }
+  .f1{ animation-duration: 8.5s; animation-delay: -2.3s; }
+  .f2{ animation-duration: 11.5s; animation-delay: -7.8s; animation-direction: reverse;
+       width: 5px; height: 5px; opacity: .9; }
+  .f3{ animation-duration: 14s;   animation-delay: -10.1s; width: 6px; height: 6px; }
+  .p1{ animation-duration: 10.4s; animation-delay: -5.0s; animation-direction: reverse;
+       width: 6px; height: 6px; opacity: .85; }
+  .p2{ animation-duration: 15.2s; animation-delay: -12.4s; width: 5px; height: 5px; opacity: .75; }
 
   .frame::before, .frame::after,
   .via{ content: ""; position: absolute; width: 9px; height: 9px; border-radius: 50%;
@@ -216,7 +218,7 @@
 
   /* ── Año en código de resistencia ──────────────────── */
   .year{ display: grid; justify-items: center; gap: .85em; margin: 0; }
-  .resistor{ width: 200px; height: auto; }
+  .resistor{ width: 192px; height: auto; }
   .year figcaption{ color: var(--muted); }
   .year figcaption b{ color: var(--rose); font-weight: 500; }
 
@@ -343,14 +345,17 @@
   @media (prefers-reduced-motion: reduce){
     .rise{ opacity: 1; transform: none; animation: none; }
     .trace .flow{ animation: none; opacity: .9; stroke-dasharray: none; }
-    .sweep{ animation: none; opacity: .5; }
+    .frame{ animation: none; }
+    .bolita{ display: none; }
     .btn{ transition: none; }
   }
 </style>
 
 <main class="plate">
-  <span class="sweep"></span>
-  <div class="frame"><span class="sweep"></span></div>
+  <span class="bolita p1"></span><span class="bolita p2"></span>
+  <div class="frame">
+    <span class="bolita f1"></span><span class="bolita f2"></span><span class="bolita f3"></span>
+  </div>
   <span class="via bl"></span><span class="via br"></span>
 
   <header class="institution mono rise d1">
@@ -381,44 +386,31 @@
   <p class="degree rise d5">Ingeniera Electrónica</p>
 
   <figure class="year rise d6">
-    <svg class="resistor" viewBox="0 0 220 60" role="img" aria-label="El año 2026 escrito en el código de colores de una resistencia: rojo, negro, rojo, azul, y banda dorada de tolerancia.">
+    <svg class="resistor" viewBox="0 0 220 60" role="img" aria-label="Una resistencia dibujada a línea con cuatro bandas; la primera y la tercera son del mismo tono, como los dos doses de 2026.">
       <defs>
-        <linearGradient id="cuerpo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#F2DFCA"/>
-          <stop offset="45%"  stop-color="#E0C4A6"/>
-          <stop offset="100%" stop-color="#B9997B"/>
-        </linearGradient>
-        <linearGradient id="brillo" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#FFFFFF" stop-opacity=".42"/>
-          <stop offset="26%"  stop-color="#FFFFFF" stop-opacity="0"/>
-          <stop offset="70%"  stop-color="#000000" stop-opacity="0"/>
-          <stop offset="100%" stop-color="#000000" stop-opacity=".30"/>
-        </linearGradient>
         <clipPath id="barril">
-          <rect x="58" y="12" width="104" height="36" rx="9"/>
+          <rect x="58" y="14" width="104" height="32" rx="16"/>
         </clipPath>
       </defs>
 
-      <line x1="8"   y1="30" x2="52"  y2="30" stroke="#AEB6C0" stroke-width="2.6" stroke-linecap="round"/>
-      <line x1="168" y1="30" x2="212" y2="30" stroke="#AEB6C0" stroke-width="2.6" stroke-linecap="round"/>
-
-      <rect x="48"  y="18" width="15" height="24" rx="5" fill="url(#cuerpo)"/>
-      <rect x="157" y="18" width="15" height="24" rx="5" fill="url(#cuerpo)"/>
-
-      <rect x="58" y="12" width="104" height="36" rx="9" fill="url(#cuerpo)"/>
-
-      <g clip-path="url(#barril)">
-        <rect x="70"  y="12" width="10" height="36" fill="#B62025"/>
-        <rect x="88"  y="12" width="10" height="36" fill="#1C1C1E"/>
-        <rect x="106" y="12" width="10" height="36" fill="#B62025"/>
-        <rect x="124" y="12" width="10" height="36" fill="#2E5FA3"/>
-        <rect x="146" y="12" width="9"  height="36" fill="#C8A02E"/>
-        <rect x="58"  y="12" width="104" height="36" fill="url(#brillo)"/>
+      <g fill="none" stroke="var(--gold)" stroke-width="1.4" stroke-linecap="round">
+        <line x1="14" y1="30" x2="58"  y2="30"/>
+        <line x1="162" y1="30" x2="206" y2="30"/>
+        <circle cx="10"  cy="30" r="3.2"/>
+        <circle cx="210" cy="30" r="3.2"/>
       </g>
 
-      <rect x="58" y="12" width="104" height="36" rx="9" fill="none" stroke="rgba(11,14,19,.38)" stroke-width="1"/>
+      <g clip-path="url(#barril)">
+        <rect x="80"  y="14" width="6" height="32" fill="var(--rose-deep)"/>
+        <rect x="98"  y="14" width="6" height="32" fill="var(--rose-pale)"/>
+        <rect x="116" y="14" width="6" height="32" fill="var(--rose-deep)"/>
+        <rect x="134" y="14" width="6" height="32" fill="var(--gold)"/>
+      </g>
+
+      <rect x="58" y="14" width="104" height="32" rx="16"
+            fill="none" stroke="var(--gold)" stroke-width="1.4"/>
     </svg>
-    <figcaption class="mono">Promoción <b>2026</b> · rojo · negro · rojo · azul</figcaption>
+    <figcaption class="mono">Promoción <b>2026</b></figcaption>
   </figure>
 
   <p class="closing rise d7">Nos vemos pronto</p>
@@ -439,13 +431,13 @@
   </dl>
 
   <div class="aside rise d9">
-      <p class="mono label">Invita mi madre</p>
-      <p class="host">Milena Padilla</p>
-      <p class="note">Ella caminó conmigo cada semestre de esta carrera. Esta noche quiere agradecerte por acompañarnos.</p>
+    <p class="mono label">Invita mi madre</p>
+    <p class="host">Milena Padilla</p>
+    <p class="note">Ella caminó conmigo cada semestre de esta carrera. Nada de esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos.</p>
   </div>
 
-  <a class="btn rise d10" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Cuenta%20conmigo%20para%20la%20cena.%20Ah%C3%AD%20estar%C3%A9%20para%20celebrar%20contigo%20%F0%9F%A5%82" target="_blank" rel="noopener">
-    <span class="dot"></span> Cuenta conmigo
+  <a class="btn rise d10" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82" target="_blank" rel="noopener">
+    <span class="dot"></span> Confirmar asistencia
   </a>
 
   <section class="memoriam rise d10">
