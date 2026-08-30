@@ -10,12 +10,17 @@ Para cambiar el diseño, edita SHELL. Para cambiar los datos, edita PAGINAS.
 """
 import io
 import re
+from urllib.parse import quote
 
 # ── Datos de cada página ─────────────────────────────────────────────────
 PAGINAS = [
   {
     "archivo": "index.html",
     "titulo":  "Participación de Grado Luciana De la Rosa",
+    "icono":   "\U0001F393",
+    "desc":    "Ceremonia de grado de Luciana De la Rosa Padilla, Ingeniera "
+               "Electrónica. Viernes 25 de septiembre de 2026, 4:00 p. m., "
+               "Coliseo Universidad del Norte.",
     "eyebrow": "Participación",
     "lead":    "Con la alegría de una etapa que se cierra y otra que empieza, "
                "quiero compartir contigo el día en que recibo mi título",
@@ -38,6 +43,9 @@ PAGINAS = [
   {
     "archivo": "cena.html",
     "titulo":  "Cena de Grado Luciana De la Rosa",
+    "icono":   "\U0001F942",
+    "desc":    "Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de "
+               "septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.",
     "eyebrow": "Cena de grado",
     "lead":    "Al cerrar la ceremonia quiero seguir celebrando contigo. "
                "Te esperamos en nuestra mesa para brindar juntos",
@@ -57,8 +65,19 @@ PAGINAS = [
 
 WHATSAPP = "https://wa.me/573215699335?text="
 
+# El icono de la pestaña: un emoji dentro de un SVG, incrustado en el HTML.
+SVG_ICONO = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
+             "<text y='.92em' font-size='92'>%s</text></svg>")
+ICONO = "data:image/svg+xml,%s"
+
 # ── Plantilla común ──────────────────────────────────────────────────────
 SHELL = r"""<title>@@TITULO@@</title>
+<link rel="icon" href="@@ICONO@@">
+<meta name="description" content="@@DESC@@">
+<meta name="theme-color" content="#0B0E13">
+<meta property="og:type" content="website">
+<meta property="og:title" content="@@TITULO@@">
+<meta property="og:description" content="@@DESC@@">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">
@@ -523,12 +542,15 @@ ITEM = """    <div class="item">
 def build():
     for pg in PAGINAS:
         detalles = "\n".join(ITEM % d for d in pg["detalles"])
+        icono = ICONO % quote(SVG_ICONO % pg["icono"])
         madre = MADRE % (pg["madre"], DEDICATORIA)
         aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
         cta = CTA % (WHATSAPP + pg["cta_msg"], pg["cta_texto"]) if pg["cta_texto"] else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
+            ("@@ICONO@@",     icono),
+            ("@@DESC@@",      pg["desc"]),
             ("@@TITULO@@",    pg["titulo"]),
             ("@@EYEBROW@@",   pg["eyebrow"]),
             ("@@LEAD@@",      pg["lead"]),
