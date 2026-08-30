@@ -40,7 +40,7 @@ PAGINAS = [
     "eyebrow": "Cena de grado",
     "lead":    "Al cerrar la ceremonia quiero seguir celebrando contigo. "
                "Te esperamos en nuestra mesa para brindar juntos",
-    "closing": "Nos vemos en la mesa.",
+    "closing": "Nos vemos pronto",
     "detalles": [
       ("Fecha", "Viernes 25 de septiembre", "de 2026"),
       ("Hora",  "8:00 p.&nbsp;m.",          "Después de la ceremonia"),
@@ -70,6 +70,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     --plate-top:  #1B212B;
     --line:       #2A333F;
 
+    --rose-pale:  #FBDCE5;   /* rosa claro, arranque del degradé */
     --rose:       #F2B0C2;   /* rosa principal */
     --rose-deep:  #D2839C;   /* rosa apagado, para reglas y etiquetas */
     --gold:       #DFA88C;   /* oro rosado, para pistas y bordes */
@@ -130,6 +131,30 @@ SHELL = r"""<title>@@TITULO@@</title>
     inset: clamp(9px, 2.2vw, 17px);
     pointer-events: none;
     border: 1px solid rgba(223,168,140,.38);
+    animation: respirar 7s ease-in-out infinite;
+  }
+  @keyframes respirar{
+    0%, 100% { border-color: rgba(223,168,140,.34); }
+    50%      { border-color: rgba(242,176,194,.66); }
+  }
+
+  /* chispa que recorre el borde, como corriente por la pista */
+  .spark{
+    position: absolute;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--rose-pale);
+    box-shadow: 0 0 12px 3px rgba(242,176,194,.7);
+    animation: recorrer 11s linear infinite;
+  }
+  /* los porcentajes van pesados por el largo de cada lado, para que la
+     chispa no acelere en los lados cortos */
+  @keyframes recorrer{
+    0%   { top: -4px; left: -4px; }
+    17%  { top: -4px; left: calc(100% - 3px); }
+    50%  { top: calc(100% - 3px); left: calc(100% - 3px); }
+    67%  { top: calc(100% - 3px); left: -4px; }
+    100% { top: -4px; left: -4px; }
   }
   .frame::before, .frame::after,
   .via{ content: ""; position: absolute; width: 9px; height: 9px; border-radius: 50%;
@@ -193,9 +218,20 @@ SHELL = r"""<title>@@TITULO@@</title>
     font-size: var(--step-3);
     line-height: 1.02;
     text-wrap: balance;
-    color: var(--paper);
+    color: var(--rose);   /* respaldo si el navegador no recorta el degradé */
   }
-  .name .surname{ display: block; color: var(--rose); }
+  .name .surname{ display: block; }
+  @supports (background-clip: text) or (-webkit-background-clip: text){
+    .name{
+      background-image: linear-gradient(163deg,
+        var(--rose-pale) 0%, var(--rose) 42%, var(--rose-deep) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 8px 22px rgba(242,176,194,.22));
+    }
+  }
 
   .degree{
     margin: 0;
@@ -352,12 +388,14 @@ SHELL = r"""<title>@@TITULO@@</title>
   @media (prefers-reduced-motion: reduce){
     .rise{ opacity: 1; transform: none; animation: none; }
     .trace .flow{ animation: none; opacity: .9; stroke-dasharray: none; }
+    .frame{ animation: none; }
+    .spark{ display: none; }
     .btn{ transition: none; }
   }
 </style>
 
 <main class="plate">
-  <div class="frame"></div>
+  <div class="frame"><span class="spark"></span></div>
   <span class="via bl"></span><span class="via br"></span>
 
   <header class="institution mono rise d1">
@@ -423,7 +461,7 @@ SHELL = r"""<title>@@TITULO@@</title>
       <p><span class="mono rel">Mi abuelo</span><span class="who">Abel Padilla Manga</span></p>
       <p><span class="mono rel">Mi papá</span><span class="who">Manfred Von Lignau</span></p>
     </div>
-    <p class="note">Ustedes me enseñaron el pulso y la paciencia. Este título lleva su nombre y hoy celebran conmigo.</p>
+    <p class="note">Mis ejemplos a seguir, mi motor, mi hombro en el que apoyarme, que aunque no están conmigo en persona, este título lleva su nombre y hoy celebran conmigo.</p>
   </section>
 
 @@SIGNOFF@@</main>
