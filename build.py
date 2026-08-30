@@ -25,6 +25,7 @@ PAGINAS = [
       ("Hora",  "4:00 p.&nbsp;m.",          "Hora de Barranquilla (GMT-5)"),
       ("Lugar", "Coliseo Universidad del Norte", "Barranquilla"),
     ],
+    "madre":   "Mi madre",
     "aside": """
       <p class="mono label">A la distancia</p>
       <p class="note">Si no puedes acompañarme en persona, quiero que estés igual:
@@ -46,12 +47,10 @@ PAGINAS = [
       ("Hora",  "8:00 p.&nbsp;m.",          "Después de la ceremonia"),
       ("Lugar", "Rincón del Viejo Country", "Country Club Barranquilla"),
     ],
-    "aside": """
-      <p class="mono label">Invita mi madre</p>
-      <p class="host">Milena Padilla</p>
-      <p class="note">Ella caminó conmigo cada semestre de esta carrera. Esta noche quiere agradecerte por acompañarnos.</p>""",
-    "cta_texto": "Cuenta conmigo",
-    "cta_msg":   "%C2%A1Hola%20Luciana%21%20Cuenta%20conmigo%20para%20la%20cena.%20Ah%C3%AD%20estar%C3%A9%20para%20celebrar%20contigo%20%F0%9F%A5%82",
+    "madre":   "Invita mi madre",
+    "aside":   None,
+    "cta_texto": "Confirmar asistencia",
+    "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
     "signoff":   "Traje formal · Cupo limitado",
   },
 ]
@@ -488,9 +487,7 @@ SHELL = r"""<title>@@TITULO@@</title>
 @@DETALLES@@
   </dl>
 
-  <div class="aside rise d9">@@ASIDE@@
-  </div>
-
+@@MADRE@@@@ASIDE@@
 @@CTA@@
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
@@ -507,6 +504,20 @@ SHELL = r"""<title>@@TITULO@@</title>
   </section>
 
 @@SIGNOFF@@</main>
+"""
+
+DEDICATORIA = "Ella caminó conmigo cada semestre de esta carrera. Nada de \
+esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos."
+
+MADRE = """  <div class="aside rise d9">
+    <p class="mono label">%s</p>
+    <p class="host">Milena Padilla</p>
+    <p class="note">%s</p>
+  </div>
+"""
+
+ASIDE = """  <div class="aside rise d9">%s
+  </div>
 """
 
 CTA = """  <a class="btn rise d10" href="%s" target="_blank" rel="noopener">
@@ -526,6 +537,8 @@ ITEM = """    <div class="item">
 def build():
     for pg in PAGINAS:
         detalles = "\n".join(ITEM % d for d in pg["detalles"])
+        madre = MADRE % (pg["madre"], DEDICATORIA)
+        aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
         cta = CTA % (WHATSAPP + pg["cta_msg"], pg["cta_texto"]) if pg["cta_texto"] else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
@@ -535,7 +548,8 @@ def build():
             ("@@LEAD@@",      pg["lead"]),
             ("@@CLOSING@@",   pg["closing"]),
             ("@@DETALLES@@",  detalles),
-            ("@@ASIDE@@",     pg["aside"].rstrip()),
+            ("@@MADRE@@",     madre),
+            ("@@ASIDE@@",     aside),
             ("@@CTA@@",     cta),
             ("@@SIGNOFF@@", signoff),
         ]:
