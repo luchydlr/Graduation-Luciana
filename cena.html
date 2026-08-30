@@ -66,50 +66,46 @@
     text-align: center;
   }
 
-  /* El ángulo se registra para poder animarlo; si el navegador no soporta
-     @property, el degradé queda quieto en vez de romperse. */
-  @property --ang{ syntax: "<angle>"; initial-value: 0deg; inherits: false; }
-
   .frame{
     position: absolute;
     inset: clamp(9px, 2.2vw, 17px);
     pointer-events: none;
     border: 1px solid rgba(223,168,140,.34);
+    animation: respirar 6s ease-in-out infinite;
+  }
+  @keyframes respirar{
+    0%, 100% { border-color: rgba(223,168,140,.30); }
+    50%      { border-color: rgba(242,176,194,.60); }
   }
 
-  /* Dos luces recorren el contorno en sentidos opuestos: una por el borde
-     de la tarjeta y otra, más tenue, por el hilo interior. */
-  .sweep{
+  /* Varias bolitas recorren el contorno a velocidades distintas, unas en
+     un sentido y otras en el contrario, para que nunca se repita el cruce. */
+  .bolita{
     position: absolute;
-    inset: -1px;
-    padding: 1px;
-    pointer-events: none;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-    animation: girar 9s linear infinite;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--rose-pale);
+    box-shadow:
+      0 0 8px 2px rgba(242,176,194,.9),
+      0 0 20px 7px rgba(210,131,156,.4);
+    animation: vuelta 6s linear infinite;
   }
-  .plate > .sweep{
-    background: conic-gradient(from var(--ang),
-      transparent 0deg 190deg,
-      rgba(210,131,156,.35) 258deg,
-      var(--rose) 306deg,
-      var(--rose-pale) 330deg,
-      var(--rose) 344deg,
-      transparent 360deg);
+  /* Los porcentajes van pesados por el largo de cada lado, para que no
+     acelere al pasar por los lados cortos. */
+  @keyframes vuelta{
+    0%   { top: -4px; left: -4px; }
+    17%  { top: -4px; left: calc(100% - 3px); }
+    50%  { top: calc(100% - 3px); left: calc(100% - 3px); }
+    67%  { top: calc(100% - 3px); left: -4px; }
+    100% { top: -4px; left: -4px; }
   }
-  .frame > .sweep{
-    background: conic-gradient(from var(--ang),
-      transparent 0deg 214deg,
-      rgba(223,168,140,.45) 286deg,
-      var(--rose-pale) 322deg,
-      transparent 352deg);
-    animation-duration: 14s;
-    animation-direction: reverse;
-    opacity: .8;
-  }
-  @keyframes girar{ to{ --ang: 360deg; } }
+  .f1{ animation-duration: 5.2s; animation-delay: -1.4s; }
+  .f2{ animation-duration: 7.1s; animation-delay: -4.8s; animation-direction: reverse;
+       width: 5px; height: 5px; opacity: .9; }
+  .f3{ animation-duration: 8.6s; animation-delay: -6.2s; width: 6px; height: 6px; }
+  .p1{ animation-duration: 6.4s; animation-delay: -3.1s; animation-direction: reverse;
+       width: 6px; height: 6px; opacity: .85; }
+  .p2{ animation-duration: 9.3s; animation-delay: -7.6s; width: 5px; height: 5px; opacity: .75; }
 
   .frame::before, .frame::after,
   .via{ content: ""; position: absolute; width: 9px; height: 9px; border-radius: 50%;
@@ -343,14 +339,17 @@
   @media (prefers-reduced-motion: reduce){
     .rise{ opacity: 1; transform: none; animation: none; }
     .trace .flow{ animation: none; opacity: .9; stroke-dasharray: none; }
-    .sweep{ animation: none; opacity: .5; }
+    .frame{ animation: none; }
+    .bolita{ display: none; }
     .btn{ transition: none; }
   }
 </style>
 
 <main class="plate">
-  <span class="sweep"></span>
-  <div class="frame"><span class="sweep"></span></div>
+  <span class="bolita p1"></span><span class="bolita p2"></span>
+  <div class="frame">
+    <span class="bolita f1"></span><span class="bolita f2"></span><span class="bolita f3"></span>
+  </div>
   <span class="via bl"></span><span class="via br"></span>
 
   <header class="institution mono rise d1">
