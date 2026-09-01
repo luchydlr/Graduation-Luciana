@@ -122,6 +122,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     padding: clamp(14px, 4vw, 56px) clamp(12px, 4vw, 40px) clamp(40px, 8vw, 88px);
     display: flex;
     justify-content: center;
+    align-items: flex-start;
   }
 
   /* ── Placa ─────────────────────────────────────────── */
@@ -129,6 +130,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     position: relative;
     width: 100%;
     max-width: 620px;
+    --frame-inset: clamp(9px, 2.2vw, 17px);
     overflow-wrap: break-word;
     background:
       linear-gradient(168deg, rgba(242,176,194,.07) 0%, rgba(242,176,194,0) 38%),
@@ -147,7 +149,7 @@ SHELL = r"""<title>@@TITULO@@</title>
 
   .frame{
     position: absolute;
-    inset: clamp(9px, 2.2vw, 17px);
+    inset: var(--frame-inset);
     pointer-events: none;
     border: 1px solid rgba(223,168,140,.34);
     animation: respirar 9s ease-in-out infinite;
@@ -191,14 +193,15 @@ SHELL = r"""<title>@@TITULO@@</title>
         background: var(--plate); border: 1px solid var(--gold); }
   .frame::before{ top: -5px; left: -5px; }
   .frame::after{ top: -5px; right: -5px; }
-  .via.bl{ bottom: -5px; left: -5px; }
-  .via.br{ bottom: -5px; right: -5px; }
+  .via.bl{ bottom: calc(var(--frame-inset) - 5px); left: calc(var(--frame-inset) - 5px); }
+  .via.br{ bottom: calc(var(--frame-inset) - 5px); right: calc(var(--frame-inset) - 5px); }
 
   /* ── Retrato ───────────────────────────────────────── */
   .portrait{
     margin: 0;
+    flex-shrink: 0;
     position: relative;
-    width: clamp(148px, 36vw, 186px);
+    width: clamp(160px, 42vw, 205px);
     aspect-ratio: 3 / 4;
     border-radius: 999px 999px 8px 8px;
     overflow: hidden;
@@ -408,6 +411,20 @@ SHELL = r"""<title>@@TITULO@@</title>
 
   a:focus-visible, button:focus-visible{ outline: 2px solid var(--rose); outline-offset: 4px; }
 
+  /* ── Pantalla completa en móvil y tablet ───────────── */
+  @media (max-width: 780px){
+    :root, body{ overflow-x: hidden; }
+    body{ padding: 0; }
+    .plate{
+      max-width: none;
+      min-height: 100vh;
+      min-height: 100svh;
+      border: 0;
+      box-shadow: none;
+      padding: clamp(40px, 11vw, 62px) clamp(26px, 7vw, 46px) clamp(46px, 11vw, 64px);
+    }
+  }
+
   /* ── Entrada ───────────────────────────────────────── */
   .rise{ opacity: 0; transform: translateY(14px); animation: rise .95s cubic-bezier(.22,.68,.35,1) forwards; }
   @keyframes rise{ to{ opacity: 1; transform: none; } }
@@ -441,7 +458,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   <h1 class="name rise d3">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
   <figure class="portrait rise d4">
-    <img src="foto.jpg" alt="Luciana De la Rosa Padilla"
+    <img src="foto.webp" alt="Luciana De la Rosa Padilla"
          onerror="this.parentNode.classList.add('empty'); this.remove();">
   </figure>
 
