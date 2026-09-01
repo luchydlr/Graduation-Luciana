@@ -201,7 +201,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     margin: 0;
     flex-shrink: 0;
     position: relative;
-    width: clamp(148px, 36vw, 186px);
+    width: clamp(160px, 42vw, 205px);
     aspect-ratio: 3 / 4;
     border-radius: 999px 999px 8px 8px;
     overflow: hidden;
@@ -458,7 +458,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   <h1 class="name rise d3">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
   <figure class="portrait rise d4">
-    <img src="foto.jpg" alt="Luciana De la Rosa Padilla"
+    <img src="foto.jpg" alt="Luciana De la Rosa Padilla con su madre, Milena Padilla"
          onerror="this.parentNode.classList.add('empty'); this.remove();">
   </figure>
 
