@@ -458,7 +458,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   <h1 class="name rise d3">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
   <figure class="portrait rise d4">
-    <img src="foto.jpg" alt="Luciana De la Rosa Padilla con su madre, Milena Padilla"
+    <img src="foto.webp" alt="Luciana De la Rosa Padilla"
          onerror="this.parentNode.classList.add('empty'); this.remove();">
   </figure>
 
