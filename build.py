@@ -49,7 +49,7 @@ PAGINAS = [
     "eyebrow": "Cena de grado",
     "lead":    "Al cerrar la ceremonia quiero seguir celebrando contigo. "
                "Te esperamos en nuestra mesa para brindar juntos",
-    "closing": "Nos vemos pronto",
+    "closing": "\u00a1Nos vemos pronto!",
     "detalles": [
       ("Fecha", "Viernes 25 de septiembre", "de 2026"),
       ("Hora",  "8:00 p.&nbsp;m.",          "Después de la ceremonia"),
@@ -537,7 +537,6 @@ SHELL = r"""<title>@@TITULO@@</title>
   </figure>
 
   <p class="closing rise d7">@@CLOSING@@</p>
-@@SOBRES@@
 
   <dl class="details rise d8">
 @@DETALLES@@
@@ -559,7 +558,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     <p class="note">Mis ejemplos a seguir, mi motor, mi hombro en el que apoyarme, que aunque no están conmigo en persona, este título lleva su nombre y hoy celebran conmigo.</p>
   </section>
 
-@@SIGNOFF@@</main>
+@@SIGNOFF@@@@SOBRES@@</main>
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
@@ -604,7 +603,7 @@ CTA = """  <a class="btn rise d10" href="%s%s" data-wa="%s" target="_blank" rel=
   </a>
 """
 
-SOBRES = """  <p class="sobres rise d7">
+SOBRES = """  <p class="sobres rise d10">
     <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
       <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
       <path d="M 1.5 4 L 32 25 L 62.5 4"/>
