@@ -57,14 +57,8 @@ PAGINAS = [
     ],
     "madre":   "Invita mi madre",
     "pases":   True,
-    "aside": """
-      <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
-        <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
-        <path d="M 1.5 4 L 32 25 L 62.5 4"/>
-      </svg>
-      <p class="mono label">Lluvia de sobres</p>
-      <p class="note">Que vengas ya es el regalo. Y si quieres darme un empujón
-      para lo que sigue, esa noche habrá lluvia de sobres.</p>""",
+    "sobres":  True,
+    "aside":   None,
     "cta_texto": "Confirmar asistencia",
     "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
     "signoff":   "Traje formal · Cupo limitado",
@@ -359,13 +353,25 @@ SHELL = r"""<title>@@TITULO@@</title>
   }
   .note{ margin: 0; max-width: 36ch; color: var(--soft); font-size: var(--step-0); font-weight: 300; line-height: 1.75; }
 
+  .sobres{
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: .8em;
+    color: var(--gold);
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: var(--step--1);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    opacity: .82;
+  }
   .sobre{
-    width: 58px; height: auto;
+    width: 26px; height: auto;
+    flex-shrink: 0;
     fill: none;
-    stroke: var(--gold);
-    stroke-width: 1.3;
+    stroke: currentColor;
+    stroke-width: 2.4;
     stroke-linejoin: round;
-    opacity: .85;
   }
 
   .pases{
@@ -531,6 +537,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   </figure>
 
   <p class="closing rise d7">@@CLOSING@@</p>
+@@SOBRES@@
 
   <dl class="details rise d8">
 @@DETALLES@@
@@ -597,6 +604,14 @@ CTA = """  <a class="btn rise d10" href="%s%s" data-wa="%s" target="_blank" rel=
   </a>
 """
 
+SOBRES = """  <p class="sobres rise d7">
+    <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
+      <path d="M 1.5 4 L 32 25 L 62.5 4"/>
+    </svg>Lluvia de sobres
+  </p>
+"""
+
 PASES = """  <p class="pases rise d10" data-pases>Reservado un puesto a tu nombre</p>
 """
 
@@ -616,7 +631,8 @@ def build():
         madre = MADRE % (pg["madre"], DEDICATORIA)
         aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
         cta = CTA % (WHATSAPP, pg["cta_msg"], WHATSAPP, pg["cta_texto"]) if pg["cta_texto"] else ""
-        pases = PASES if pg.get("pases") else ""
+        pases  = PASES  if pg.get("pases")  else ""
+        sobres = SOBRES if pg.get("sobres") else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
@@ -629,6 +645,7 @@ def build():
             ("@@DETALLES@@",  detalles),
             ("@@MADRE@@",     madre),
             ("@@ASIDE@@",     aside),
+            ("@@SOBRES@@",  sobres),
             ("@@PASES@@",   pases),
             ("@@CTA@@",     cta),
             ("@@SIGNOFF@@", signoff),
