@@ -499,7 +499,7 @@
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
      (o el número que sea): cambia los cupos del pie y el mensaje de
-     WhatsApp. Sin el parámetro, la línea dice "un cupo". */
+     WhatsApp. Sin el parámetro, la línea dice "1 cupo". */
   (function(){
     var linea = document.querySelector("[data-pases]");
     if (!linea) return;
@@ -508,8 +508,7 @@
     if (!(n > 1)) return;
     n = Math.min(n, 8);
 
-    var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
-    linea.textContent = palabras[n] + " cupos";
+    linea.textContent = n + " cupos";
 
     var btn = document.querySelector("a.btn[data-wa]");
     if (btn) {
