@@ -299,16 +299,6 @@
     stroke-linejoin: round;
   }
 
-  .pases{
-    margin: 0;
-    color: var(--gold);
-    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-    font-size: var(--step--1);
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    text-wrap: balance;
-  }
-
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -484,7 +474,6 @@
     <p class="note">Ella caminó conmigo cada semestre de esta carrera. Nada de esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos.</p>
   </div>
 
-  <p class="pases rise d10" data-pases>Reservado un puesto a tu nombre</p>
   <a class="btn rise d10" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82" data-wa="https://wa.me/573215699335?text=" target="_blank" rel="noopener">
     <span class="dot"></span> Confirmar asistencia
   </a>
@@ -503,7 +492,7 @@
     <p class="note">Mis ejemplos a seguir, mi motor, mi hombro en el que apoyarme, que aunque no están conmigo en persona, este título lleva su nombre y hoy celebran conmigo.</p>
   </section>
 
-  <p class="mono signoff rise d10">Traje formal · Cupo limitado</p>
+  <p class="mono signoff rise d10">Traje formal · <span data-pases>Cupo limitado</span></p>
   <p class="sobres rise d10">
     <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
       <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
@@ -514,7 +503,8 @@
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
-     (o el número que sea). Sin el parámetro, la invitación es de un puesto. */
+     (o el número que sea): cambia los cupos del pie y el mensaje de
+     WhatsApp. Sin el parámetro, la línea dice "Cupo limitado". */
   (function(){
     var linea = document.querySelector("[data-pases]");
     if (!linea) return;
@@ -524,7 +514,7 @@
     n = Math.min(n, 8);
 
     var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
-    linea.textContent = "Reservados " + palabras[n] + " puestos a tu nombre";
+    linea.textContent = palabras[n] + " cupos";
 
     var btn = document.querySelector("a.btn[data-wa]");
     if (btn) {

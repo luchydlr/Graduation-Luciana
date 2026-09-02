@@ -299,16 +299,6 @@
     stroke-linejoin: round;
   }
 
-  .pases{
-    margin: 0;
-    color: var(--gold);
-    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-    font-size: var(--step--1);
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    text-wrap: balance;
-  }
-
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -508,7 +498,8 @@
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
-     (o el número que sea). Sin el parámetro, la invitación es de un puesto. */
+     (o el número que sea): cambia los cupos del pie y el mensaje de
+     WhatsApp. Sin el parámetro, la línea dice "Cupo limitado". */
   (function(){
     var linea = document.querySelector("[data-pases]");
     if (!linea) return;
@@ -518,7 +509,7 @@
     n = Math.min(n, 8);
 
     var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
-    linea.textContent = "Reservados " + palabras[n] + " puestos a tu nombre";
+    linea.textContent = palabras[n] + " cupos";
 
     var btn = document.querySelector("a.btn[data-wa]");
     if (btn) {

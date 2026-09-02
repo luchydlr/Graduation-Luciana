@@ -56,12 +56,11 @@ PAGINAS = [
       ("Lugar", "Rincón del Viejo Country", "Country Club Barranquilla"),
     ],
     "madre":   "Invita mi madre",
-    "pases":   True,
     "sobres":  True,
     "aside":   None,
     "cta_texto": "Confirmar asistencia",
     "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
-    "signoff":   "Traje formal · Cupo limitado",
+    "signoff":   'Traje formal · <span data-pases>Cupo limitado</span>',
   },
 ]
 
@@ -374,16 +373,6 @@ SHELL = r"""<title>@@TITULO@@</title>
     stroke-linejoin: round;
   }
 
-  .pases{
-    margin: 0;
-    color: var(--gold);
-    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-    font-size: var(--step--1);
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    text-wrap: balance;
-  }
-
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -543,7 +532,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   </dl>
 
 @@MADRE@@@@ASIDE@@
-@@PASES@@@@CTA@@
+@@CTA@@
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
       <line x1="0" y1="7" x2="103" y2="7"/>
@@ -562,7 +551,8 @@ SHELL = r"""<title>@@TITULO@@</title>
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
-     (o el número que sea). Sin el parámetro, la invitación es de un puesto. */
+     (o el número que sea): cambia los cupos del pie y el mensaje de
+     WhatsApp. Sin el parámetro, la línea dice "Cupo limitado". */
   (function(){
     var linea = document.querySelector("[data-pases]");
     if (!linea) return;
@@ -572,7 +562,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     n = Math.min(n, 8);
 
     var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
-    linea.textContent = "Reservados " + palabras[n] + " puestos a tu nombre";
+    linea.textContent = palabras[n] + " cupos";
 
     var btn = document.querySelector("a.btn[data-wa]");
     if (btn) {
@@ -611,9 +601,6 @@ SOBRES = """  <p class="sobres rise d10">
   </p>
 """
 
-PASES = """  <p class="pases rise d10" data-pases>Reservado un puesto a tu nombre</p>
-"""
-
 SIGNOFF = """  <p class="mono signoff rise d10">%s</p>
 """
 
@@ -630,7 +617,6 @@ def build():
         madre = MADRE % (pg["madre"], DEDICATORIA)
         aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
         cta = CTA % (WHATSAPP, pg["cta_msg"], WHATSAPP, pg["cta_texto"]) if pg["cta_texto"] else ""
-        pases  = PASES  if pg.get("pases")  else ""
         sobres = SOBRES if pg.get("sobres") else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
@@ -645,7 +631,6 @@ def build():
             ("@@MADRE@@",     madre),
             ("@@ASIDE@@",     aside),
             ("@@SOBRES@@",  sobres),
-            ("@@PASES@@",   pases),
             ("@@CTA@@",     cta),
             ("@@SIGNOFF@@", signoff),
         ]:
