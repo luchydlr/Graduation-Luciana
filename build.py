@@ -62,7 +62,7 @@ PAGINAS = [
     "aside":   None,
     "cta_texto": "Confirmar asistencia",
     "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
-    "signoff":   'Traje formal · <span data-pases>un cupo</span>',
+    "signoff":   'Traje formal · <span data-pases>1 cupo</span>',
   },
 ]
 
@@ -554,7 +554,7 @@ SHELL = r"""<title>@@TITULO@@</title>
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
      (o el número que sea): cambia los cupos del pie y el mensaje de
-     WhatsApp. Sin el parámetro, la línea dice "un cupo". */
+     WhatsApp. Sin el parámetro, la línea dice "1 cupo". */
   (function(){
     var linea = document.querySelector("[data-pases]");
     if (!linea) return;
@@ -563,8 +563,7 @@ SHELL = r"""<title>@@TITULO@@</title>
     if (!(n > 1)) return;
     n = Math.min(n, 8);
 
-    var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
-    linea.textContent = palabras[n] + " cupos";
+    linea.textContent = n + " cupos";
 
     var btn = document.querySelector("a.btn[data-wa]");
     if (btn) {

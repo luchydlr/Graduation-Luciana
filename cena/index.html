@@ -492,7 +492,7 @@
     <p class="note">Mis ejemplos a seguir, mi motor, mi hombro en el que apoyarme, que aunque no están conmigo en persona, este título lleva su nombre y hoy celebran conmigo.</p>
   </section>
 
-  <p class="mono signoff rise d10">Traje formal · <span data-pases>un cupo</span></p>
+  <p class="mono signoff rise d10">Traje formal · <span data-pases>1 cupo</span></p>
   <p class="sobres rise d10">
     <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
       <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
@@ -504,7 +504,7 @@
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
      (o el número que sea): cambia los cupos del pie y el mensaje de
-     WhatsApp. Sin el parámetro, la línea dice "un cupo". */
+     WhatsApp. Sin el parámetro, la línea dice "1 cupo". */
   (function(){
     var linea = document.querySelector("[data-pases]");
     if (!linea) return;
@@ -513,8 +513,7 @@
     if (!(n > 1)) return;
     n = Math.min(n, 8);
 
-    var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
-    linea.textContent = palabras[n] + " cupos";
+    linea.textContent = n + " cupos";
 
     var btn = document.querySelector("a.btn[data-wa]");
     if (btn) {
