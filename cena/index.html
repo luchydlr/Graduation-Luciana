@@ -1,86 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Genera las dos páginas del grado desde una sola plantilla, para que se vean
-idénticas: index.html (participación) y cena.html (invitación a la cena).
-
-    python3 build.py
-
-Para cambiar el diseño, edita SHELL. Para cambiar los datos, edita PAGINAS.
-"""
-import io
-import os
-import re
-from urllib.parse import quote
-
-# ── Datos de cada página ─────────────────────────────────────────────────
-PAGINAS = [
-  {
-    "archivo": "index.html",
-    "titulo":  "Participación de Grado Luciana De la Rosa",
-    "icono":   "\U0001F393",
-    "desc":    "Ceremonia de grado de Luciana De la Rosa Padilla, Ingeniera "
-               "Electrónica. Viernes 25 de septiembre de 2026, 4:00 p. m., "
-               "Coliseo Universidad del Norte.",
-    "eyebrow": "Participación",
-    "lead":    "Con la alegría de una etapa que se cierra y otra que empieza, "
-               "quiero compartir contigo el día en que recibo mi título",
-    "closing": "Aunque sea a la distancia, cierras el circuito conmigo.",
-    "detalles": [
-      ("Fecha", "Viernes 25 de septiembre", "de 2026"),
-      ("Hora",  "4:00 p.&nbsp;m.",          "Hora de Barranquilla (GMT-5)"),
-      ("Lugar", "Coliseo Universidad del Norte", "Barranquilla"),
-    ],
-    "madre":   "Mi madre",
-    "aside": """
-      <p class="mono label">A la distancia</p>
-      <p class="note">Si no puedes acompañarme en persona, quiero que estés igual:
-      la ceremonia se transmite en vivo y ese día también cuentas.</p>
-      <span class="btn pending">Enlace de transmisión pendiente</span>""",
-    "cta_texto": None,
-    "cta_msg":   None,
-    "signoff":   None,
-  },
-  {
-    "archivo": "cena/index.html",
-    "base":    "../",
-    "titulo":  "Cena de Grado Luciana De la Rosa",
-    "icono":   "\U0001F942",
-    "desc":    "Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de "
-               "septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.",
-    "eyebrow": "Cena de grado",
-    "lead":    "Al cerrar la ceremonia quiero seguir celebrando contigo. "
-               "Te esperamos en nuestra mesa para brindar juntos",
-    "closing": "\u00a1Nos vemos pronto!",
-    "detalles": [
-      ("Fecha", "Viernes 25 de septiembre", "de 2026"),
-      ("Hora",  "8:00 p.&nbsp;m.",          "Después de la ceremonia"),
-      ("Lugar", "Rincón del Viejo Country", "Country Club Barranquilla"),
-    ],
-    "madre":   "Invita mi madre",
-    "sobres":  True,
-    "aside":   None,
-    "cta_texto": "Confirmar asistencia",
-    "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
-    "signoff":   'Traje formal · <span data-pases>un cupo</span>',
-  },
-]
-
-WHATSAPP = "https://wa.me/573215699335?text="
-
-# El icono de la pestaña: un emoji dentro de un SVG, incrustado en el HTML.
-SVG_ICONO = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
-             "<text y='.92em' font-size='92'>%s</text></svg>")
-ICONO = "data:image/svg+xml,%s"
-
-# ── Plantilla común ──────────────────────────────────────────────────────
-SHELL = r"""<title>@@TITULO@@</title>
-<link rel="icon" href="@@ICONO@@">
-<meta name="description" content="@@DESC@@">
+<title>Cena de Grado Luciana De la Rosa</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ctext%20y%3D%27.92em%27%20font-size%3D%2792%27%3E%F0%9F%A5%82%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.">
 <meta name="theme-color" content="#0B0E13">
 <meta property="og:type" content="website">
-<meta property="og:title" content="@@TITULO@@">
-<meta property="og:description" content="@@DESC@@">
+<meta property="og:title" content="Cena de Grado Luciana De la Rosa">
+<meta property="og:description" content="Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">
@@ -474,15 +398,15 @@ SHELL = r"""<title>@@TITULO@@</title>
 
   <header class="institution mono rise d1">
     <span class="school">Universidad del Norte</span>
-    <span class="kind">@@EYEBROW@@</span>
+    <span class="kind">Cena de grado</span>
   </header>
 
-  <p class="lead rise d2">@@LEAD@@</p>
+  <p class="lead rise d2">Al cerrar la ceremonia quiero seguir celebrando contigo. Te esperamos en nuestra mesa para brindar juntos</p>
 
   <h1 class="name rise d3">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
   <figure class="portrait rise d4">
-    <img src="@@BASE@@foto.webp" alt="Luciana De la Rosa Padilla"
+    <img src="../foto.webp" alt="Luciana De la Rosa Padilla"
          onerror="this.parentNode.classList.add('empty'); this.remove();">
   </figure>
 
@@ -527,14 +451,33 @@ SHELL = r"""<title>@@TITULO@@</title>
     <figcaption class="mono">Promoción <b>2026</b></figcaption>
   </figure>
 
-  <p class="closing rise d7">@@CLOSING@@</p>
+  <p class="closing rise d7">¡Nos vemos pronto!</p>
 
   <dl class="details rise d8">
-@@DETALLES@@
+    <div class="item">
+      <dt class="mono">Fecha</dt>
+      <dd>Viernes 25 de septiembre<small>de 2026</small></dd>
+    </div>
+    <div class="item">
+      <dt class="mono">Hora</dt>
+      <dd>8:00 p.&nbsp;m.<small>Después de la ceremonia</small></dd>
+    </div>
+    <div class="item">
+      <dt class="mono">Lugar</dt>
+      <dd>Rincón del Viejo Country<small>Country Club Barranquilla</small></dd>
+    </div>
   </dl>
 
-@@MADRE@@@@ASIDE@@
-@@CTA@@
+  <div class="aside rise d9">
+    <p class="mono label">Invita mi madre</p>
+    <p class="host">Milena Padilla</p>
+    <p class="note">Ella caminó conmigo cada semestre de esta carrera. Nada de esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos.</p>
+  </div>
+
+  <a class="btn rise d10" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82" data-wa="https://wa.me/573215699335?text=" target="_blank" rel="noopener">
+    <span class="dot"></span> Confirmar asistencia
+  </a>
+
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
       <line x1="0" y1="7" x2="103" y2="7"/>
@@ -549,7 +492,14 @@ SHELL = r"""<title>@@TITULO@@</title>
     <p class="note">Mis ejemplos a seguir, mi motor, mi hombro en el que apoyarme, que aunque no están conmigo en persona, este título lleva su nombre y hoy celebran conmigo.</p>
   </section>
 
-@@SIGNOFF@@@@SOBRES@@</main>
+  <p class="mono signoff rise d10">Traje formal · <span data-pases>un cupo</span></p>
+  <p class="sobres rise d10">
+    <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
+      <path d="M 1.5 4 L 32 25 L 62.5 4"/>
+    </svg>Lluvia de sobres
+  </p>
+</main>
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
@@ -574,93 +524,3 @@ SHELL = r"""<title>@@TITULO@@</title>
     }
   })();
 </script>
-"""
-
-DEDICATORIA = "Ella caminó conmigo cada semestre de esta carrera. Nada de \
-esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos."
-
-MADRE = """  <div class="aside rise d9">
-    <p class="mono label">%s</p>
-    <p class="host">Milena Padilla</p>
-    <p class="note">%s</p>
-  </div>
-"""
-
-ASIDE = """  <div class="aside rise d9">%s
-  </div>
-"""
-
-CTA = """  <a class="btn rise d10" href="%s%s" data-wa="%s" target="_blank" rel="noopener">
-    <span class="dot"></span> %s
-  </a>
-"""
-
-SOBRES = """  <p class="sobres rise d10">
-    <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
-      <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
-      <path d="M 1.5 4 L 32 25 L 62.5 4"/>
-    </svg>Lluvia de sobres
-  </p>
-"""
-
-SIGNOFF = """  <p class="mono signoff rise d10">%s</p>
-"""
-
-# Enlaces ya repartidos con la dirección vieja. El guion conserva el ?pases;
-# la recarga por meta es el respaldo si el navegador no ejecuta guiones.
-REDIRECCION = """<title>Cena de Grado Luciana De la Rosa</title>
-<link rel="canonical" href="https://luchydlr.github.io/Graduation-Luciana/cena/">
-<meta name="robots" content="noindex">
-<script>location.replace("./cena/" + location.search + location.hash);</script>
-<meta http-equiv="refresh" content="1; url=./cena/">
-<p style="font-family: system-ui, sans-serif; padding: 2rem; text-align: center">
-  Esta invitación está ahora en <a href="./cena/">cena/</a>.
-</p>
-"""
-
-ITEM = """    <div class="item">
-      <dt class="mono">%s</dt>
-      <dd>%s<small>%s</small></dd>
-    </div>"""
-
-
-def build():
-    for pg in PAGINAS:
-        detalles = "\n".join(ITEM % d for d in pg["detalles"])
-        icono = ICONO % quote(SVG_ICONO % pg["icono"])
-        madre = MADRE % (pg["madre"], DEDICATORIA)
-        aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
-        cta = CTA % (WHATSAPP, pg["cta_msg"], WHATSAPP, pg["cta_texto"]) if pg["cta_texto"] else ""
-        sobres = SOBRES if pg.get("sobres") else ""
-        signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
-        html = SHELL
-        for token, valor in [
-            ("@@ICONO@@",     icono),
-            ("@@DESC@@",      pg["desc"]),
-            ("@@BASE@@",      pg.get("base", "")),
-            ("@@TITULO@@",    pg["titulo"]),
-            ("@@EYEBROW@@",   pg["eyebrow"]),
-            ("@@LEAD@@",      pg["lead"]),
-            ("@@CLOSING@@",   pg["closing"]),
-            ("@@DETALLES@@",  detalles),
-            ("@@MADRE@@",     madre),
-            ("@@ASIDE@@",     aside),
-            ("@@SOBRES@@",  sobres),
-            ("@@CTA@@",     cta),
-            ("@@SIGNOFF@@", signoff),
-        ]:
-            html = html.replace(token, valor)
-        html = re.sub(r"\n{3,}", "\n\n", html)
-        assert "@@" not in html, "quedó un token sin reemplazar en " + pg["archivo"]
-        carpeta = os.path.dirname(pg["archivo"])
-        if carpeta:
-            os.makedirs(carpeta, exist_ok=True)
-        io.open(pg["archivo"], "w", encoding="utf-8").write(html)
-        print("escrito", pg["archivo"], len(html), "bytes")
-
-    io.open("cena.html", "w", encoding="utf-8").write(REDIRECCION)
-    print("escrito cena.html (redirección a cena/)")
-
-
-if __name__ == "__main__":
-    build()
