@@ -56,7 +56,15 @@ PAGINAS = [
       ("Lugar", "Rincón del Viejo Country", "Country Club Barranquilla"),
     ],
     "madre":   "Invita mi madre",
-    "aside":   None,
+    "pases":   True,
+    "aside": """
+      <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
+        <path d="M 1.5 4 L 32 25 L 62.5 4"/>
+      </svg>
+      <p class="mono label">Lluvia de sobres</p>
+      <p class="note">Que vengas ya es el regalo. Y si quieres darme un empujón
+      para lo que sigue, esa noche habrá lluvia de sobres.</p>""",
     "cta_texto": "Confirmar asistencia",
     "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
     "signoff":   "Traje formal · Cupo limitado",
@@ -351,6 +359,25 @@ SHELL = r"""<title>@@TITULO@@</title>
   }
   .note{ margin: 0; max-width: 36ch; color: var(--soft); font-size: var(--step-0); font-weight: 300; line-height: 1.75; }
 
+  .sobre{
+    width: 58px; height: auto;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.3;
+    stroke-linejoin: round;
+    opacity: .85;
+  }
+
+  .pases{
+    margin: 0;
+    color: var(--gold);
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: var(--step--1);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -510,7 +537,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   </dl>
 
 @@MADRE@@@@ASIDE@@
-@@CTA@@
+@@PASES@@@@CTA@@
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
       <line x1="0" y1="7" x2="103" y2="7"/>
@@ -526,6 +553,29 @@ SHELL = r"""<title>@@TITULO@@</title>
   </section>
 
 @@SIGNOFF@@</main>
+
+<script>
+  /* Los invitados que van con acompañante reciben el enlace con ?pases=2
+     (o el número que sea). Sin el parámetro, la invitación es de un puesto. */
+  (function(){
+    var linea = document.querySelector("[data-pases]");
+    if (!linea) return;
+
+    var n = parseInt(new URLSearchParams(location.search).get("pases"), 10);
+    if (!(n > 1)) return;
+    n = Math.min(n, 8);
+
+    var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
+    linea.textContent = "Reservados " + palabras[n] + " puestos a tu nombre";
+
+    var btn = document.querySelector("a.btn[data-wa]");
+    if (btn) {
+      btn.href = btn.dataset.wa + encodeURIComponent(
+        "\u00a1Hola Luciana! Confirmamos nuestra asistencia, somos " + n +
+        " personas. Nos vemos en la cena \ud83e\udd42");
+    }
+  })();
+</script>
 """
 
 DEDICATORIA = "Ella caminó conmigo cada semestre de esta carrera. Nada de \
@@ -542,9 +592,12 @@ ASIDE = """  <div class="aside rise d9">%s
   </div>
 """
 
-CTA = """  <a class="btn rise d10" href="%s" target="_blank" rel="noopener">
+CTA = """  <a class="btn rise d10" href="%s%s" data-wa="%s" target="_blank" rel="noopener">
     <span class="dot"></span> %s
   </a>
+"""
+
+PASES = """  <p class="pases rise d10" data-pases>Reservado un puesto a tu nombre</p>
 """
 
 SIGNOFF = """  <p class="mono signoff rise d10">%s</p>
@@ -562,7 +615,8 @@ def build():
         icono = ICONO % quote(SVG_ICONO % pg["icono"])
         madre = MADRE % (pg["madre"], DEDICATORIA)
         aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
-        cta = CTA % (WHATSAPP + pg["cta_msg"], pg["cta_texto"]) if pg["cta_texto"] else ""
+        cta = CTA % (WHATSAPP, pg["cta_msg"], WHATSAPP, pg["cta_texto"]) if pg["cta_texto"] else ""
+        pases = PASES if pg.get("pases") else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
@@ -575,6 +629,7 @@ def build():
             ("@@DETALLES@@",  detalles),
             ("@@MADRE@@",     madre),
             ("@@ASIDE@@",     aside),
+            ("@@PASES@@",   pases),
             ("@@CTA@@",     cta),
             ("@@SIGNOFF@@", signoff),
         ]:

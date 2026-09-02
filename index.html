@@ -278,6 +278,25 @@
   }
   .note{ margin: 0; max-width: 36ch; color: var(--soft); font-size: var(--step-0); font-weight: 300; line-height: 1.75; }
 
+  .sobre{
+    width: 58px; height: auto;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.3;
+    stroke-linejoin: round;
+    opacity: .85;
+  }
+
+  .pases{
+    margin: 0;
+    color: var(--gold);
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: var(--step--1);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -474,3 +493,26 @@
   </section>
 
 </main>
+
+<script>
+  /* Los invitados que van con acompañante reciben el enlace con ?pases=2
+     (o el número que sea). Sin el parámetro, la invitación es de un puesto. */
+  (function(){
+    var linea = document.querySelector("[data-pases]");
+    if (!linea) return;
+
+    var n = parseInt(new URLSearchParams(location.search).get("pases"), 10);
+    if (!(n > 1)) return;
+    n = Math.min(n, 8);
+
+    var palabras = ["", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"];
+    linea.textContent = "Reservados " + palabras[n] + " puestos a tu nombre";
+
+    var btn = document.querySelector("a.btn[data-wa]");
+    if (btn) {
+      btn.href = btn.dataset.wa + encodeURIComponent(
+        "\u00a1Hola Luciana! Confirmamos nuestra asistencia, somos " + n +
+        " personas. Nos vemos en la cena \ud83e\udd42");
+    }
+  })();
+</script>
