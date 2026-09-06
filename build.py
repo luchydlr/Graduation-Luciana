@@ -73,21 +73,14 @@ SVG_ICONO = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
              "<text y='.92em' font-size='92'>%s</text></svg>")
 ICONO = "data:image/svg+xml,%s"
 
-# ── Plantilla común ──────────────────────────────────────────────────────
-SHELL = r"""<title>@@TITULO@@</title>
-<link rel="icon" href="@@ICONO@@">
-<meta name="description" content="@@DESC@@">
-<meta name="theme-color" content="#0B0E13">
-<meta property="og:type" content="website">
-<meta property="og:title" content="@@TITULO@@">
-<meta property="og:description" content="@@DESC@@">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+# ── Cimientos compartidos ────────────────────────────────────────────────
+# La paleta y las fuentes se escriben una sola vez: las usan la tarjeta de
+# pantalla (SHELL) y el menú impreso (MENU).
+FUENTES = """<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@300;400;500&display=swap">"""
 
-<style>
-  :root{
-    --ink:        #0B0E13;
+COLORES = """    --ink:        #0B0E13;
     --plate:      #151A22;
     --plate-top:  #1B212B;
     --line:       #2A333F;
@@ -99,7 +92,21 @@ SHELL = r"""<title>@@TITULO@@</title>
 
     --paper:      #F6F1EE;
     --soft:       #DFD7D6;
-    --muted:      #B6BEC7;
+    --muted:      #B6BEC7;"""
+
+# ── Plantilla común ──────────────────────────────────────────────────────
+SHELL = r"""<title>@@TITULO@@</title>
+<link rel="icon" href="@@ICONO@@">
+<meta name="description" content="@@DESC@@">
+<meta name="theme-color" content="#0B0E13">
+<meta property="og:type" content="website">
+<meta property="og:title" content="@@TITULO@@">
+<meta property="og:description" content="@@DESC@@">
+@@FUENTES@@
+
+<style>
+  :root{
+@@COLORES@@
 
     --step--1: clamp(.76rem, .72rem + .2vw, .86rem);
     --step-0:  clamp(1rem,  .95rem + .32vw, 1.14rem);
@@ -623,6 +630,273 @@ ITEM = """    <div class="item">
     </div>"""
 
 
+# ── Menú impreso de la cena ──────────────────────────────────────────────
+# Tarjeta larga de 10 x 21 cm, una por puesto. Cambia aquí los platos: cada
+# uno es (nombre, descripción); la descripción puede ir vacía. Después corre
+# `python3 build.py` y luego `python3 imprimir.py` para el PDF.
+MENU_DATOS = {
+    "titulo": "Menú · Cena de grado Luciana De la Rosa",
+    "icono":  "\U0001F37D",
+    "nota":   "Esta noche cierro seis años de circuitos, trasnochos y cálculos, "
+              "y no quería celebrarlo sin ti. Gracias por sentarte a esta mesa "
+              "conmigo.",
+    "cursos": [
+        {
+            "titulo": "Entradas",
+            "hint":   None,
+            "separar": False,
+            "platos": [
+                ("Nombre de la primera entrada", "Una línea corta que la describa"),
+                ("Nombre de la segunda entrada", "Una línea corta que la describa"),
+            ],
+        },
+        {
+            "titulo": "Plato fuerte",
+            "hint":   "Elige uno",
+            "separar": True,
+            "platos": [
+                ("Nombre del primer plato",  "Acompañamiento o ingredientes, en una línea"),
+                ("Nombre del segundo plato", "Acompañamiento o ingredientes, en una línea"),
+                ("Nombre del tercer plato",  "Acompañamiento o ingredientes, en una línea"),
+            ],
+        },
+    ],
+    "pie": ["Rincón del Viejo Country",
+            "25 de septiembre de 2026 · 8:00 p.&nbsp;m."],
+    "cierre": "¡Buen provecho!",
+}
+
+# El menú se imprime: nada de animaciones, medidas en milímetros y colores
+# forzados para que la placa oscura salga en el papel.
+MENU = r"""<title>@@TITULO@@</title>
+<link rel="icon" href="@@ICONO@@">
+<meta name="robots" content="noindex">
+@@FUENTES@@
+
+<style>
+  :root{
+@@COLORES@@
+  }
+
+  @page{ size: 100mm 210mm; margin: 0; }
+
+  *{ box-sizing: border-box; }
+
+  html, body{ margin: 0; padding: 0; background: var(--ink); }
+
+  body{
+    display: flex;
+    justify-content: center;
+    color: var(--paper);
+    font-family: "Jost", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* La tarjeta mide exactamente el papel. */
+  .card{
+    position: relative;
+    width: 100mm;
+    height: 210mm;
+    overflow: hidden;
+    padding: 13mm 10mm 11mm;
+    background:
+      radial-gradient(120% 44% at 50% -6%, rgba(210,131,156,.20) 0%, rgba(210,131,156,0) 62%),
+      radial-gradient(100% 38% at 50% 104%, rgba(223,168,140,.14) 0%, rgba(223,168,140,0) 68%),
+      linear-gradient(var(--plate-top), var(--plate) 42%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .frame{
+    position: absolute;
+    inset: 7mm;
+    border: .3mm solid rgba(223,168,140,.42);
+    pointer-events: none;
+  }
+  .frame::before, .frame::after,
+  .via{ content: ""; position: absolute; width: 2.4mm; height: 2.4mm; border-radius: 50%;
+        background: var(--plate); border: .3mm solid var(--gold); }
+  .frame::before{ top: -1.2mm; left: -1.2mm; }
+  .frame::after{ top: -1.2mm; right: -1.2mm; }
+  .via.bl{ bottom: 5.8mm; left: 5.8mm; }
+  .via.br{ bottom: 5.8mm; right: 5.8mm; }
+
+  /* ── Tipografía ────────────────────────────────────── */
+  .mono{
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 6.2pt;
+    font-weight: 400;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .institution{ display: grid; gap: 2mm; }
+  .institution .school{ color: var(--gold); letter-spacing: .24em; }
+  .institution .kind{ color: var(--rose-deep); letter-spacing: .28em; }
+
+  .name{
+    margin: 4mm 0 0;
+    font-family: "Bodoni Moda", "Didot", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 19pt;
+    line-height: 1.06;
+    color: var(--rose);
+  }
+  .name .surname{ display: block; font-size: 11.5pt; color: var(--rose-deep); margin-top: 2mm; }
+
+  .nota{
+    margin: 3.5mm auto 0;
+    max-width: 62mm;
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-style: italic;
+    font-size: 8.4pt;
+    line-height: 1.5;
+    color: var(--rose);
+    text-wrap: balance;
+  }
+
+  /* ── Pista de circuito, quieta para el papel ───────── */
+  .trace{ width: 48mm; height: auto; display: block; margin: 4.5mm auto 0; overflow: visible; }
+  .trace .t{ fill: none; stroke: rgba(223,168,140,.55); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .trace .pad{ fill: var(--plate); stroke: var(--gold); stroke-width: 1.4; }
+  .trace .core{ fill: var(--rose); }
+
+  /* ── Los cursos ────────────────────────────────────── */
+  .menu{ width: 100%; margin: 4mm 0; }
+  .curso + .curso{ margin-top: 6.5mm; }
+
+  .curso > .titulo{
+    font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    font-size: 7pt;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    margin: 0;
+  }
+  .curso > .hint{ margin-top: 1.6mm; font-size: 5.6pt; letter-spacing: .22em; color: var(--muted); }
+
+  .curso > .regla{ width: 24mm; height: .25mm; margin: 2.6mm auto 0; border: 0;
+                   background: linear-gradient(90deg, rgba(242,176,194,0), rgba(242,176,194,.55), rgba(242,176,194,0)); }
+
+  .plato{ margin: 4mm auto 0; max-width: 64mm; }
+  .plato .que{
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-size: 11.5pt;
+    line-height: 1.24;
+    color: var(--paper);
+    margin: 0;
+    text-wrap: balance;
+  }
+  .plato .como{
+    margin: 1.4mm 0 0;
+    font-size: 7.2pt;
+    line-height: 1.5;
+    letter-spacing: .01em;
+    color: var(--muted);
+    text-wrap: balance;
+  }
+  /* En el plato fuerte se elige, así que cada opción va separada. */
+  .elige .plato + .plato{ padding-top: 4mm; border-top: .2mm solid rgba(210,131,156,.30); }
+
+  /* ── Pie ───────────────────────────────────────────── */
+  .cierre{
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-style: italic;
+    font-size: 9.5pt;
+    color: var(--rose);
+    margin: 0 0 3.5mm;
+  }
+  .pie{ display: grid; gap: 1.8mm; }
+  .pie .donde{ color: var(--gold); letter-spacing: .22em; }
+  .pie .cuando{ font-size: 5.8pt; letter-spacing: .16em; }
+</style>
+
+<main class="card">
+  <div class="frame"></div>
+  <span class="via bl"></span><span class="via br"></span>
+
+  <header>
+    <div class="institution mono">
+      <span class="school">Universidad del Norte</span>
+      <span class="kind">Cena de grado</span>
+    </div>
+
+    <h1 class="name">Luciana<span class="surname">De la Rosa Padilla</span></h1>
+
+    <p class="nota">@@NOTA@@</p>
+
+    <svg class="trace" viewBox="0 0 400 40" role="presentation" aria-hidden="true">
+      <path class="t" d="M 6 20 H 84 l 12 -12 H 164 l 12 12 H 188"/>
+      <path class="t" d="M 394 20 H 316 l -12 12 H 236 l -12 -12 H 212"/>
+      <circle class="pad" cx="6" cy="20" r="3.4"/>
+      <circle class="pad" cx="394" cy="20" r="3.4"/>
+      <circle class="pad" cx="200" cy="20" r="7"/>
+      <circle class="core" cx="200" cy="20" r="2.4"/>
+    </svg>
+  </header>
+
+  <div class="menu">
+@@CURSOS@@
+  </div>
+
+  <footer>
+    <p class="cierre">@@CIERRE@@</p>
+    <div class="pie mono">
+@@PIE@@
+    </div>
+  </footer>
+</main>
+"""
+
+CURSO = """    <section class="curso%s">
+      <p class="titulo">%s</p>%s
+      <hr class="regla">
+%s
+    </section>"""
+
+PLATO = """      <div class="plato">
+        <p class="que">%s</p>%s
+      </div>"""
+
+
+def build_menu():
+    cursos = []
+    for c in MENU_DATOS["cursos"]:
+        platos = "\n".join(
+            PLATO % (que, '\n        <p class="como">%s</p>' % como if como else "")
+            for que, como in c["platos"]
+        )
+        hint = '\n      <p class="hint mono">%s</p>' % c["hint"] if c["hint"] else ""
+        cursos.append(CURSO % (" elige" if c["separar"] else "", c["titulo"], hint, platos))
+
+    html = MENU
+    for token, valor in [
+        ("@@FUENTES@@", FUENTES),
+        ("@@COLORES@@", COLORES),
+        ("@@TITULO@@",  MENU_DATOS["titulo"]),
+        ("@@ICONO@@",   ICONO % quote(SVG_ICONO % MENU_DATOS["icono"])),
+        ("@@NOTA@@",    MENU_DATOS["nota"]),
+        ("@@CURSOS@@",  "\n\n".join(cursos)),
+        ("@@CIERRE@@",  MENU_DATOS["cierre"]),
+        ("@@PIE@@",     "\n".join('      <span class="%s">%s</span>'
+                                  % ("donde" if i == 0 else "cuando", t)
+                                  for i, t in enumerate(MENU_DATOS["pie"]))),
+    ]:
+        html = html.replace(token, valor)
+    assert "@@" not in html, "quedó un token sin reemplazar en el menú"
+    os.makedirs("menu", exist_ok=True)
+    io.open("menu/index.html", "w", encoding="utf-8").write(html)
+    print("escrito menu/index.html", len(html), "bytes")
+
+
 def build():
     for pg in PAGINAS:
         detalles = "\n".join(ITEM % d for d in pg["detalles"])
@@ -634,6 +908,8 @@ def build():
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
+            ("@@FUENTES@@",   FUENTES),
+            ("@@COLORES@@",   COLORES),
             ("@@ICONO@@",     icono),
             ("@@DESC@@",      pg["desc"]),
             ("@@BASE@@",      pg.get("base", "")),
@@ -659,6 +935,8 @@ def build():
 
     io.open("cena.html", "w", encoding="utf-8").write(REDIRECCION)
     print("escrito cena.html (redirección a cena/)")
+
+    build_menu()
 
 
 if __name__ == "__main__":
