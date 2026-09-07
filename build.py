@@ -701,7 +701,7 @@ MENU = r"""<title>@@TITULO@@</title>
     width: 100mm;
     height: 210mm;
     overflow: hidden;
-    padding: 13mm 10mm 11mm;
+    padding: 12mm 10mm 11mm;
     background:
       radial-gradient(120% 44% at 50% -6%, rgba(210,131,156,.20) 0%, rgba(210,131,156,0) 62%),
       radial-gradient(100% 38% at 50% 104%, rgba(223,168,140,.14) 0%, rgba(223,168,140,0) 68%),
@@ -738,22 +738,25 @@ MENU = r"""<title>@@TITULO@@</title>
     margin: 0;
   }
 
-  .institution{ display: grid; gap: 2mm; }
+  .institution{ display: grid; gap: 2.4mm; }
   .institution .school{ color: var(--gold); letter-spacing: .24em; }
   .institution .kind{ color: var(--rose-deep); letter-spacing: .28em; }
 
+  /* Los huecos del encabezado van generosos a propósito: al subir el PDF a
+     Canva, cada línea entra como su propia caja de texto y con otra letra;
+     con el aire de sobra, ninguna se le monta a la de al lado. */
   .name{
-    margin: 4mm 0 0;
+    margin: 7mm 0 0;
     font-family: "Bodoni Moda", "Didot", "Times New Roman", serif;
     font-weight: 400;
     font-size: 19pt;
-    line-height: 1.06;
+    line-height: 1.16;
     color: var(--rose);
   }
-  .name .surname{ display: block; font-size: 11.5pt; color: var(--rose-deep); margin-top: 2mm; }
+  .name .surname{ display: block; font-size: 11.5pt; color: var(--rose-deep); margin-top: 2.6mm; }
 
   .nota{
-    margin: 3.5mm auto 0;
+    margin: 6mm auto 0;
     max-width: 62mm;
     font-family: "Bodoni Moda", "Didot", serif;
     font-style: italic;
@@ -764,14 +767,14 @@ MENU = r"""<title>@@TITULO@@</title>
   }
 
   /* ── Pista de circuito, quieta para el papel ───────── */
-  .trace{ width: 48mm; height: auto; display: block; margin: 4.5mm auto 0; overflow: visible; }
+  .trace{ width: 48mm; height: auto; display: block; margin: 4mm auto 0; overflow: visible; }
   .trace .t{ fill: none; stroke: rgba(223,168,140,.55); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   .trace .pad{ fill: var(--plate); stroke: var(--gold); stroke-width: 1.4; }
   .trace .core{ fill: var(--rose); }
 
   /* ── Los cursos ────────────────────────────────────── */
   .menu{ width: 100%; margin: 4mm 0; }
-  .curso + .curso{ margin-top: 6.5mm; }
+  .curso + .curso{ margin-top: 6mm; }
 
   .curso > .titulo{
     font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -786,7 +789,7 @@ MENU = r"""<title>@@TITULO@@</title>
   .curso > .regla{ width: 24mm; height: .25mm; margin: 2.6mm auto 0; border: 0;
                    background: linear-gradient(90deg, rgba(242,176,194,0), rgba(242,176,194,.55), rgba(242,176,194,0)); }
 
-  .plato{ margin: 4mm auto 0; max-width: 64mm; }
+  .plato{ margin: 3.7mm auto 0; max-width: 64mm; }
   .plato .que{
     font-family: "Bodoni Moda", "Didot", serif;
     font-size: 11.5pt;
