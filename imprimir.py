@@ -19,6 +19,9 @@ import tempfile
 from urllib.request import Request, urlopen
 
 FUENTE = "menu/index.html"
+ANCHO, ALTO = 378, 794      # la tarjeta en píxeles de pantalla: 10 x 21 cm
+ESCALA = 3                  # x3 para que el fondo salga a unos 300 puntos por pulgada
+VENTANA = (500, 900)        # la ventana con la que se fotografía el fondo
 SALIDA = "menu/menu-cena.pdf"
 CACHE = ".fuentes"          # las tipografías bajadas, para no repetir la descarga
 
@@ -64,6 +67,64 @@ def incrustar(html):
     return html.replace(enlace.group(0), "<style>\n%s\n</style>" % css)
 
 
+def medir(navegador, molde, ancho, alto):
+    """Pregunta al navegador cuánto mide la tarjeta y cuánto ve de la página."""
+    sonda = ("<script>addEventListener('load',function(){"
+             "var r=document.querySelector('.card').getBoundingClientRect();"
+             "document.body.setAttribute('data-caja',[r.width,r.height,innerWidth,innerHeight]"
+             ".join(','));});</script>")
+    io.open(molde, "a", encoding="utf-8").write(sonda)
+    dom = subprocess.run([navegador, "--headless", "--disable-gpu", "--no-sandbox",
+                          "--hide-scrollbars", "--force-device-scale-factor=%d" % ESCALA,
+                          "--window-size=%d,%d" % (ancho, alto),
+                          "--virtual-time-budget=4000", "--dump-dom", molde],
+                         capture_output=True, text=True).stdout
+    medidas = re.search(r'data-caja="([\d.,]+)"', dom)
+    if not medidas:
+        sys.exit("No pude medir la tarjeta: ¿cambió menu/index.html?")
+    return [float(n) for n in medidas.group(1).split(",")]
+
+
+def fondo(navegador, pagina):
+    """Devuelve el degradé de la tarjeta como una imagen, en una regla de CSS.
+
+    Canva no entiende los degradés que Chrome escribe en el PDF: los repinta a
+    escalones y en otro color. Una foto del fondo, en cambio, la respeta. Se
+    fotografía la propia página con el contenido escondido, para que la imagen
+    salga siempre del mismo CSS y no haya dos fondos que mantener.
+    """
+    # La tarjeta se pega a la esquina y se le esconde el contenido: así la foto
+    # empieza justo donde empieza la tarjeta.
+    escondido = ("<style>body{ display: block !important }"
+                 " .card{ margin: 0 !important }"
+                 " .card > *{ visibility: hidden }</style>")
+    molde = os.path.join(tempfile.mkdtemp(), "fondo.html")
+    io.open(molde, "w", encoding="utf-8").write(pagina + escondido)
+
+    # Chrome no abre ventanas de menos de 500 de ancho y se come unos 90 de
+    # alto, así que se pide una ventana con holgura y se comprueba que la
+    # tarjeta quepa entera; si no, se estira lo que falte.
+    ancho, alto = VENTANA
+    tarjeta_ancho, tarjeta_alto, _, visible = medir(navegador, molde, ancho, alto)
+    if visible < tarjeta_alto:
+        alto += int(tarjeta_alto - visible) + 4
+
+    png = os.path.join(os.path.dirname(molde), "fondo.png")
+    subprocess.run([navegador, "--headless", "--disable-gpu", "--no-sandbox",
+                    "--hide-scrollbars", "--force-device-scale-factor=%d" % ESCALA,
+                    "--window-size=%d,%d" % (ancho, alto),
+                    "--virtual-time-budget=4000", "--screenshot=" + png, molde],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # La foto es más grande que la tarjeta: se estira en la misma proporción
+    # para que su esquina de arriba a la izquierda calce, y lo que sobra cae
+    # fuera de la tarjeta.
+    b64 = base64.b64encode(io.open(png, "rb").read()).decode("ascii")
+    return ("<style>\n  .card{ background: url(data:image/png;base64,%s)"
+            " 0 0 / %.3f%% %.3f%% no-repeat, var(--plate) !important; }\n</style>"
+            % (b64, ancho / tarjeta_ancho * 100, alto / tarjeta_alto * 100))
+
+
 def cromo():
     for nombre in CROMOS:
         camino = shutil.which(nombre) or (nombre if os.path.exists(nombre) else None)
@@ -79,12 +140,14 @@ def cromo():
 
 
 def imprimir():
+    navegador = os.environ.get("CHROME") or cromo()
     html = incrustar(io.open(FUENTE, encoding="utf-8").read())
+    html += fondo(navegador, html)
     temporal = os.path.join(tempfile.mkdtemp(), "menu.html")
     io.open(temporal, "w", encoding="utf-8").write(html)
 
     salida = os.path.abspath(SALIDA)
-    subprocess.run([os.environ.get("CHROME") or cromo(),
+    subprocess.run([navegador,
                     "--headless", "--disable-gpu", "--no-sandbox",
                     "--no-pdf-header-footer", "--virtual-time-budget=4000",
                     "--print-to-pdf=" + salida, temporal],
