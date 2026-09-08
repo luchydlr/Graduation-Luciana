@@ -672,6 +672,14 @@ MENU_DATOS = {
                  "y perejil)."),
             ],
         },
+        {
+            "titulo": "Postre",
+            "hint":   None,
+            "separar": False,
+            "platos": [
+                ("Pudín de Baileys", ""),
+            ],
+        },
     ],
     "pie": ["Rincón del Viejo Country",
             "25 de septiembre de 2026 · 8:00 p.&nbsp;m."],
@@ -713,7 +721,7 @@ MENU = r"""<title>@@TITULO@@</title>
     width: 100mm;
     height: 210mm;
     overflow: hidden;
-    padding: 11mm 10mm 10mm;
+    padding: 10mm 10mm 9mm;
     background:
       radial-gradient(120% 44% at 50% -6%, rgba(210,131,156,.20) 0%, rgba(210,131,156,0) 62%),
       radial-gradient(100% 38% at 50% 104%, rgba(223,168,140,.14) 0%, rgba(223,168,140,0) 68%),
@@ -759,31 +767,31 @@ MENU = r"""<title>@@TITULO@@</title>
     font-family: "Bodoni Moda", "Didot", "Times New Roman", serif;
     font-weight: 400;
     font-size: 18pt;
-    line-height: 1.14;
+    line-height: 1.1;
     color: var(--rose);
   }
   .name .surname{ display: block; font-size: 11pt; color: var(--rose-deep); margin-top: 2.6mm; }
 
   .nota{
-    margin: 5mm auto 0;
+    margin: 3.5mm auto 0;
     max-width: 64mm;
     font-family: "Bodoni Moda", "Didot", serif;
     font-style: italic;
     font-size: 8pt;
-    line-height: 1.45;
+    line-height: 1.4;
     color: var(--rose);
     text-wrap: balance;
   }
 
   /* ── Pista de circuito, quieta para el papel ───────── */
-  .trace{ width: 44mm; height: auto; display: block; margin: 3.5mm auto 0; overflow: visible; }
+  .trace{ width: 42mm; height: auto; display: block; margin: 3mm auto 0; overflow: visible; }
   .trace .t{ fill: none; stroke: rgba(223,168,140,.55); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
   .trace .pad{ fill: var(--plate); stroke: var(--gold); stroke-width: 1.4; }
   .trace .core{ fill: var(--rose); }
 
   /* ── Los cursos ────────────────────────────────────── */
-  .menu{ width: 100%; margin: 3mm 0; }
-  .curso + .curso{ margin-top: 5mm; }
+  .menu{ width: 100%; margin: 1.5mm 0; }
+  .curso + .curso{ margin-top: 4mm; }
 
   .curso > .titulo{
     font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -795,12 +803,12 @@ MENU = r"""<title>@@TITULO@@</title>
   }
   .curso > .hint{ margin-top: 1.6mm; font-size: 5.6pt; letter-spacing: .22em; color: var(--muted); }
 
-  .curso > .regla{ width: 24mm; height: .25mm; margin: 2.2mm auto 0; border: 0;
+  .curso > .regla{ width: 22mm; height: .25mm; margin: 1.8mm auto 0; border: 0;
                    background: linear-gradient(90deg, rgba(242,176,194,0), rgba(242,176,194,.55), rgba(242,176,194,0)); }
 
   /* El nombre del plato va más ancho que su descripción: así los largos
      caben en una sola línea y las descripciones no se estiran. */
-  .plato{ margin: 2.6mm auto 0; max-width: 74mm; }
+  .plato{ margin: 2.1mm auto 0; max-width: 74mm; }
   .plato .que{
     font-family: "Bodoni Moda", "Didot", serif;
     font-size: 10.6pt;
@@ -812,14 +820,14 @@ MENU = r"""<title>@@TITULO@@</title>
   .plato .como{
     max-width: 68mm;
     margin: 1.2mm auto 0;
-    font-size: 6.6pt;
-    line-height: 1.42;
+    font-size: 6.5pt;
+    line-height: 1.35;
     letter-spacing: .01em;
     color: var(--muted);
     text-wrap: balance;
   }
   /* En el plato fuerte se elige, así que cada opción va separada. */
-  .elige .plato + .plato{ padding-top: 2.8mm; border-top: .2mm solid rgba(210,131,156,.30); }
+  .elige .plato + .plato{ padding-top: 2.5mm; border-top: .2mm solid rgba(210,131,156,.30); }
 
   /* ── Pie ───────────────────────────────────────────── */
   .cierre{
@@ -827,7 +835,7 @@ MENU = r"""<title>@@TITULO@@</title>
     font-style: italic;
     font-size: 9pt;
     color: var(--rose);
-    margin: 0 0 3mm;
+    margin: 0 0 2.5mm;
   }
   .pie{ display: grid; gap: 1.8mm; }
   .pie .donde{ color: var(--gold); letter-spacing: .22em; }
