@@ -35,4 +35,4 @@ editar los platos ahí mismo. Al imprimir, pedir cartulina mate y decirle al
 taller que **no** ajuste al tamaño de la hoja.
 
 Pendiente, marcado en el HTML con la clase `pending`: el enlace de la
-transmisión. En el menú, los nombres de los platos son de relleno.
+transmisión.

@@ -637,7 +637,7 @@ ITEM = """    <div class="item">
 MENU_DATOS = {
     "titulo": "Menú · Cena de grado Luciana De la Rosa",
     "icono":  "\U0001F37D",
-    "nota":   "Esta noche cierro seis años de circuitos, trasnochos y cálculos, "
+    "nota":   "Esta noche cierro cinco años de circuitos, trasnochos y cálculos, "
               "y no quería celebrarlo sin ti. Gracias por sentarte a esta mesa "
               "conmigo.",
     "cursos": [
@@ -646,18 +646,28 @@ MENU_DATOS = {
             "hint":   None,
             "separar": False,
             "platos": [
-                ("Nombre de la primera entrada", "Una línea corta que la describa"),
-                ("Nombre de la segunda entrada", "Una línea corta que la describa"),
+                ("Brócolis fritos",
+                 "Escalfados en tempura y especias, servidos con crema de aguacate "
+                 "y mayonesa casera ligeramente dulce y picante."),
+                ("Croquetas de prosciutto y manchego",
+                 "Con alioli picante."),
             ],
         },
         {
             "titulo": "Plato fuerte",
-            "hint":   "Elige uno",
+            "hint":   None,
             "separar": True,
             "platos": [
-                ("Nombre del primer plato",  "Acompañamiento o ingredientes, en una línea"),
-                ("Nombre del segundo plato", "Acompañamiento o ingredientes, en una línea"),
-                ("Nombre del tercer plato",  "Acompañamiento o ingredientes, en una línea"),
+                ("Lomo a la diabla",
+                 "250 g de lomo de res con jugo de tomate y salsa valiente del chef, "
+                 "gratinado con grana padano. Acompañado de papas francesas clásicas."),
+                ("Raviolis Country con langostinos",
+                 "Rellenos de trufa, cebolla caramelizada y roquefort, en salsa de "
+                 "azafrán con langostinos salteados."),
+                ("Tentáculos de pulpo",
+                 "Tako japonés al estilo “Rincón”, servidos con brunoise de vegetales "
+                 "y chimichurri, paprika ahumada, papas criollas, limón amarillo y "
+                 "trío de espumas (alioli, garbanzo y perejil)."),
             ],
         },
     ],
@@ -738,15 +748,12 @@ MENU = r"""<title>@@TITULO@@</title>
     margin: 0;
   }
 
-  .institution{ display: grid; gap: 2.4mm; }
-  .institution .school{ color: var(--gold); letter-spacing: .24em; }
-  .institution .kind{ color: var(--rose-deep); letter-spacing: .28em; }
 
   /* Los huecos del encabezado van generosos a propósito: al subir el PDF a
      Canva, cada línea entra como su propia caja de texto y con otra letra;
      con el aire de sobra, ninguna se le monta a la de al lado. */
   .name{
-    margin: 7mm 0 0;
+    margin: 0;
     font-family: "Bodoni Moda", "Didot", "Times New Roman", serif;
     font-weight: 400;
     font-size: 19pt;
@@ -789,7 +796,9 @@ MENU = r"""<title>@@TITULO@@</title>
   .curso > .regla{ width: 24mm; height: .25mm; margin: 2.6mm auto 0; border: 0;
                    background: linear-gradient(90deg, rgba(242,176,194,0), rgba(242,176,194,.55), rgba(242,176,194,0)); }
 
-  .plato{ margin: 3.7mm auto 0; max-width: 64mm; }
+  /* El nombre del plato va más ancho que su descripción: así los largos
+     caben en una sola línea y las descripciones no se estiran. */
+  .plato{ margin: 3.4mm auto 0; max-width: 74mm; }
   .plato .que{
     font-family: "Bodoni Moda", "Didot", serif;
     font-size: 11.5pt;
@@ -799,15 +808,16 @@ MENU = r"""<title>@@TITULO@@</title>
     text-wrap: balance;
   }
   .plato .como{
-    margin: 1.4mm 0 0;
-    font-size: 7.2pt;
-    line-height: 1.5;
+    max-width: 68mm;
+    margin: 1.4mm auto 0;
+    font-size: 7pt;
+    line-height: 1.45;
     letter-spacing: .01em;
     color: var(--muted);
     text-wrap: balance;
   }
   /* En el plato fuerte se elige, así que cada opción va separada. */
-  .elige .plato + .plato{ padding-top: 4mm; border-top: .2mm solid rgba(210,131,156,.30); }
+  .elige .plato + .plato{ padding-top: 3.6mm; border-top: .2mm solid rgba(210,131,156,.30); }
 
   /* ── Pie ───────────────────────────────────────────── */
   .cierre{
@@ -827,11 +837,6 @@ MENU = r"""<title>@@TITULO@@</title>
   <span class="via bl"></span><span class="via br"></span>
 
   <header>
-    <div class="institution mono">
-      <span class="school">Universidad del Norte</span>
-      <span class="kind">Cena de grado</span>
-    </div>
-
     <h1 class="name">Luciana<span class="surname">De la Rosa Padilla</span></h1>
 
     <p class="nota">@@NOTA@@</p>
