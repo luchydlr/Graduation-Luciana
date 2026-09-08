@@ -679,7 +679,7 @@ MENU_DATOS = {
         },
     ],
     "pie": ["Rincón del Viejo Country",
-            "25 de septiembre de 2026 · 8:00 p.&nbsp;m."],
+            "25 de septiembre de 2026"],
     "cierre": "¡Buen provecho!",
 }
 
@@ -730,19 +730,47 @@ MENU = r"""<title>@@TITULO@@</title>
     text-align: center;
   }
 
+  /* ── Marco ─────────────────────────────────────────
+     Regla doble: la de fuera en oro, cerrada, y dentro cuatro escuadras en
+     rosa que solo marcan las esquinas. En cada vértice una vía, como las de
+     la placa, y un rombo que parte la regla arriba y abajo. */
   .frame{
     position: absolute;
-    inset: 7mm;
-    border: .3mm solid rgba(223,168,140,.42);
+    inset: 6.5mm;
+    border: .3mm solid rgba(223,168,140,.5);
     pointer-events: none;
   }
-  .frame::before, .frame::after,
-  .via{ content: ""; position: absolute; width: 2.4mm; height: 2.4mm; border-radius: 50%;
-        background: var(--plate); border: .3mm solid var(--gold); }
-  .frame::before{ top: -1.2mm; left: -1.2mm; }
-  .frame::after{ top: -1.2mm; right: -1.2mm; }
-  .via.bl{ bottom: 5.8mm; left: 5.8mm; }
-  .via.br{ bottom: 5.8mm; right: 5.8mm; }
+  .frame .esquina{
+    position: absolute;
+    width: 11mm; height: 11mm;
+    border: .18mm solid rgba(242,176,194,.5);
+  }
+  .frame .tl{ top: 1.5mm; left: 1.5mm;   border-right: 0; border-bottom: 0; }
+  .frame .tr{ top: 1.5mm; right: 1.5mm;  border-left: 0;  border-bottom: 0; }
+  .frame .bl{ bottom: 1.5mm; left: 1.5mm;  border-right: 0; border-top: 0; }
+  .frame .br{ bottom: 1.5mm; right: 1.5mm; border-left: 0;  border-top: 0; }
+
+  .via{
+    position: absolute;
+    width: 2.2mm; height: 2.2mm;
+    border-radius: 50%;
+    background: var(--plate);
+    border: .3mm solid var(--gold);
+  }
+  .via.tl{ top: 5.4mm; left: 5.4mm; }
+  .via.tr{ top: 5.4mm; right: 5.4mm; }
+  .via.bl{ bottom: 5.4mm; left: 5.4mm; }
+  .via.br{ bottom: 5.4mm; right: 5.4mm; }
+
+  .rombo{
+    position: absolute;
+    left: 50%;
+    width: 1.9mm; height: 1.9mm;
+    background: var(--rose);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .rombo.arriba{ top: 5.55mm; }
+  .rombo.abajo{ bottom: 5.55mm; }
 
   /* ── Tipografía ────────────────────────────────────── */
   .mono{
@@ -840,8 +868,13 @@ MENU = r"""<title>@@TITULO@@</title>
 </style>
 
 <main class="card">
-  <div class="frame"></div>
+  <div class="frame">
+    <span class="esquina tl"></span><span class="esquina tr"></span>
+    <span class="esquina bl"></span><span class="esquina br"></span>
+  </div>
+  <span class="via tl"></span><span class="via tr"></span>
   <span class="via bl"></span><span class="via br"></span>
+  <span class="rombo arriba"></span><span class="rombo abajo"></span>
 
   <header>
     <h1 class="name">Luciana<span class="surname">De la Rosa Padilla</span></h1>
