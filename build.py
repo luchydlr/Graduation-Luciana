@@ -638,7 +638,7 @@ MENU_DATOS = {
     "titulo": "Menú · Cena de grado Luciana De la Rosa",
     "icono":  "\U0001F37D",
     "nota":   "Esta noche cierro cinco años de circuitos, trasnochos y cálculos, "
-              "y no quería celebrarlo sin ti.&nbsp; Gracias por sentarte a esta mesa "
+              "y no quería celebrarlo sin ti.<br>Gracias por sentarte a esta mesa "
               "conmigo.",
     "cursos": [
         {
