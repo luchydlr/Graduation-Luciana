@@ -642,13 +642,10 @@ MENU_DATOS = {
               "conmigo.",
     "cursos": [
         {
-            "titulo": "Entradas",
+            "titulo": "Entrada",
             "hint":   None,
             "separar": False,
             "platos": [
-                ("Brócolis fritos",
-                 "Escalfados en tempura y especias, servidos con crema de aguacate "
-                 "y mayonesa casera ligeramente dulce y picante."),
                 ("Croquetas de prosciutto y manchego",
                  "Con alioli picante."),
             ],
@@ -721,7 +718,7 @@ MENU = r"""<title>@@TITULO@@</title>
     width: 100mm;
     height: 210mm;
     overflow: hidden;
-    padding: 10mm 10mm 9mm;
+    padding: 10.5mm 10mm 9.5mm;
     background:
       radial-gradient(120% 44% at 50% -6%, rgba(210,131,156,.20) 0%, rgba(210,131,156,0) 62%),
       radial-gradient(100% 38% at 50% 104%, rgba(223,168,140,.14) 0%, rgba(223,168,140,0) 68%),
@@ -808,7 +805,7 @@ MENU = r"""<title>@@TITULO@@</title>
 
   /* El nombre del plato va más ancho que su descripción: así los largos
      caben en una sola línea y las descripciones no se estiran. */
-  .plato{ margin: 2.1mm auto 0; max-width: 74mm; }
+  .plato{ margin: 2.4mm auto 0; max-width: 74mm; }
   .plato .que{
     font-family: "Bodoni Moda", "Didot", serif;
     font-size: 10.6pt;
@@ -820,14 +817,14 @@ MENU = r"""<title>@@TITULO@@</title>
   .plato .como{
     max-width: 68mm;
     margin: 1.2mm auto 0;
-    font-size: 6.5pt;
-    line-height: 1.35;
+    font-size: 7pt;
+    line-height: 1.42;
     letter-spacing: .01em;
     color: var(--muted);
     text-wrap: balance;
   }
   /* En el plato fuerte se elige, así que cada opción va separada. */
-  .elige .plato + .plato{ padding-top: 2.5mm; border-top: .2mm solid rgba(210,131,156,.30); }
+  .elige .plato + .plato{ padding-top: 2.8mm; border-top: .2mm solid rgba(210,131,156,.30); }
 
   /* ── Pie ───────────────────────────────────────────── */
   .cierre{
