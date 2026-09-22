@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Cena de Grado Luciana De la Rosa</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ctext%20y%3D%27.92em%27%20font-size%3D%2792%27%3E%F0%9F%A5%82%3C/text%3E%3C/svg%3E">
 <meta name="description" content="Cena de grado de Luciana De la Rosa Padilla. Viernes 25 de septiembre de 2026, 8:00 p. m., Rincón del Viejo Country.">
@@ -299,6 +300,56 @@
     stroke-linejoin: round;
   }
 
+  /* ── Datos de los invitados ────────────────────────── */
+  .datos{
+    width: 100%;
+    display: grid;
+    gap: clamp(24px, 4.5vw, 34px);
+    text-align: left;
+  }
+  .datos > .nota{
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--step--1);
+    letter-spacing: .04em;
+    text-align: center;
+  }
+  .invitado{ display: grid; gap: 1.15em; }
+  .invitado .rotulo{ margin: 0; color: var(--rose-deep); }
+  .campo{ display: grid; gap: .4em; }
+  .campo > span{ color: var(--muted); }
+  .campo input{
+    width: 100%;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    padding: .45em 0;
+    color: var(--paper);
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    transition: border-color .3s ease, box-shadow .3s ease;
+  }
+  .campo input::placeholder{
+    color: rgba(182,190,199,.32);
+    font-family: "Jost", sans-serif;
+    font-size: var(--step-0);
+  }
+  .campo input:focus{
+    outline: none;
+    border-bottom-color: var(--rose);
+    box-shadow: 0 1px 0 var(--rose);
+  }
+  .campo.falta input{ border-bottom-color: #E2708A; }
+  .aviso{
+    margin: 0;
+    color: #E2708A;
+    font-size: var(--step--1);
+    letter-spacing: .04em;
+  }
+
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -474,6 +525,22 @@
     <p class="note">Ella caminó conmigo cada semestre de esta carrera. Nada de esto habría pasado sin ella, y hoy quiere agradecerte por acompañarnos.</p>
   </div>
 
+  <div class="datos rise d9" data-datos>
+    <p class="nota">Para el listado de ingreso necesitamos el nombre completo y la
+    cédula de cada persona.</p>
+    <div class="invitado">
+      <p class="mono rotulo">Tus datos</p>
+      <label class="campo">
+        <span class="mono">Nombre completo</span>
+        <input type="text" data-nombre autocomplete="name" placeholder="Como aparece en la cédula">
+      </label>
+      <label class="campo">
+        <span class="mono">Cédula</span>
+        <input type="text" data-cedula inputmode="numeric" autocomplete="off" placeholder="Sin puntos ni comas">
+      </label>
+    </div>
+    <p class="aviso" data-aviso hidden></p>
+  </div>
   <a class="btn rise d10" href="https://wa.me/573215699335?text=%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82" data-wa="https://wa.me/573215699335?text=" target="_blank" rel="noopener">
     <span class="dot"></span> Confirmar asistencia
   </a>
@@ -503,23 +570,75 @@
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
-     (o el número que sea): cambia los cupos del pie y el mensaje de
-     WhatsApp. Sin el parámetro, la línea dice "1 cupo". */
+     (o el número que sea): cambia los cupos del pie y pide los datos de
+     cada persona. Sin el parámetro, la línea dice "1 cupo".
+
+     Nada de lo que se escriba aquí se guarda ni se envía a ningún lado:
+     solo compone el mensaje de WhatsApp que el invitado manda él mismo. */
   (function(){
-    var linea = document.querySelector("[data-pases]");
-    if (!linea) return;
-
     var n = parseInt(new URLSearchParams(location.search).get("pases"), 10);
-    if (!(n > 1)) return;
-    n = Math.min(n, 8);
+    n = (n > 1) ? Math.min(n, 8) : 1;
 
-    linea.textContent = n + " cupos";
+    var linea = document.querySelector("[data-pases]");
+    if (linea && n > 1) linea.textContent = n + " cupos";
 
-    var btn = document.querySelector("a.btn[data-wa]");
-    if (btn) {
-      btn.href = btn.dataset.wa + encodeURIComponent(
-        "\u00a1Hola Luciana! Confirmamos nuestra asistencia, somos " + n +
-        " personas. Nos vemos en la cena \ud83e\udd42");
+    var datos = document.querySelector("[data-datos]");
+    var btn   = document.querySelector("a.btn[data-wa]");
+    if (!datos || !btn) return;
+
+    var aviso = datos.querySelector("[data-aviso]");
+
+    /* Un bloque de campos por cupo, siempre por encima del aviso */
+    var molde = datos.querySelector(".invitado");
+    for (var i = 1; i < n; i++) {
+      datos.insertBefore(molde.cloneNode(true), aviso);
     }
+
+    var grupos = datos.querySelectorAll(".invitado");
+    grupos.forEach(function(g, j){
+      g.querySelector(".rotulo").textContent =
+        (n === 1) ? "Tus datos" : "Invitado " + (j + 1);
+    });
+
+    btn.addEventListener("click", function(e){
+      e.preventDefault();
+
+      var lineas = [], primerFallo = null;
+
+      grupos.forEach(function(g, j){
+        var campos = g.querySelectorAll(".campo");
+        var nombre = g.querySelector("[data-nombre]");
+        var cedula = g.querySelector("[data-cedula]");
+
+        campos.forEach(function(c){ c.classList.remove("falta"); });
+
+        var vn = nombre.value.trim().replace(/\s+/g, " ");
+        var vc = cedula.value.trim();
+
+        if (!vn) { nombre.closest(".campo").classList.add("falta"); primerFallo = primerFallo || nombre; }
+        if (!vc) { cedula.closest(".campo").classList.add("falta"); primerFallo = primerFallo || cedula; }
+
+        lineas.push((n > 1 ? (j + 1) + ". " : "") + vn + " — CC " + vc);
+      });
+
+      if (primerFallo) {
+        aviso.textContent = (n > 1)
+          ? "Faltan datos. Completa el nombre y la cédula de cada invitado."
+          : "Completa tu nombre y tu cédula para confirmar.";
+        aviso.hidden = false;
+        primerFallo.focus();
+        return;
+      }
+
+      aviso.hidden = true;
+
+      var saludo = (n > 1)
+        ? "\u00a1Hola Luciana! Confirmamos nuestra asistencia a la cena \ud83e\udd42"
+        : "\u00a1Hola Luciana! Confirmo mi asistencia a la cena \ud83e\udd42";
+
+      var url = btn.dataset.wa + encodeURIComponent(saludo + "\n" + lineas.join("\n"));
+      var w = window.open(url, "_blank", "noopener");
+      if (!w) location.href = url;
+    });
   })();
 </script>

@@ -59,6 +59,7 @@ PAGINAS = [
     ],
     "madre":   "Invita mi madre",
     "sobres":  True,
+    "datos":   True,
     "aside":   None,
     "cta_texto": "Confirmar asistencia",
     "cta_msg":   "%C2%A1Hola%20Luciana%21%20Confirmo%20mi%20asistencia%2C%20nos%20vemos%20en%20la%20cena%20%F0%9F%A5%82",
@@ -74,7 +75,8 @@ SVG_ICONO = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"
 ICONO = "data:image/svg+xml,%s"
 
 # ── Plantilla común ──────────────────────────────────────────────────────
-SHELL = r"""<title>@@TITULO@@</title>
+SHELL = r"""<meta charset="utf-8">
+<title>@@TITULO@@</title>
 <link rel="icon" href="@@ICONO@@">
 <meta name="description" content="@@DESC@@">
 <meta name="theme-color" content="#0B0E13">
@@ -375,6 +377,56 @@ SHELL = r"""<title>@@TITULO@@</title>
     stroke-linejoin: round;
   }
 
+  /* ── Datos de los invitados ────────────────────────── */
+  .datos{
+    width: 100%;
+    display: grid;
+    gap: clamp(24px, 4.5vw, 34px);
+    text-align: left;
+  }
+  .datos > .nota{
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--step--1);
+    letter-spacing: .04em;
+    text-align: center;
+  }
+  .invitado{ display: grid; gap: 1.15em; }
+  .invitado .rotulo{ margin: 0; color: var(--rose-deep); }
+  .campo{ display: grid; gap: .4em; }
+  .campo > span{ color: var(--muted); }
+  .campo input{
+    width: 100%;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    padding: .45em 0;
+    color: var(--paper);
+    font-family: "Bodoni Moda", "Didot", serif;
+    font-size: var(--step-1);
+    line-height: 1.4;
+    transition: border-color .3s ease, box-shadow .3s ease;
+  }
+  .campo input::placeholder{
+    color: rgba(182,190,199,.32);
+    font-family: "Jost", sans-serif;
+    font-size: var(--step-0);
+  }
+  .campo input:focus{
+    outline: none;
+    border-bottom-color: var(--rose);
+    box-shadow: 0 1px 0 var(--rose);
+  }
+  .campo.falta input{ border-bottom-color: #E2708A; }
+  .aviso{
+    margin: 0;
+    color: #E2708A;
+    font-size: var(--step--1);
+    letter-spacing: .04em;
+  }
+
   /* ── Botones ───────────────────────────────────────── */
   .btn{
     display: inline-flex; align-items: center; gap: .75em;
@@ -534,7 +586,7 @@ SHELL = r"""<title>@@TITULO@@</title>
   </dl>
 
 @@MADRE@@@@ASIDE@@
-@@CTA@@
+@@DATOS@@@@CTA@@
   <section class="memoriam rise d10">
     <svg class="rule" viewBox="0 0 230 14" role="presentation" aria-hidden="true">
       <line x1="0" y1="7" x2="103" y2="7"/>
@@ -553,24 +605,76 @@ SHELL = r"""<title>@@TITULO@@</title>
 
 <script>
   /* Los invitados que van con acompañante reciben el enlace con ?pases=2
-     (o el número que sea): cambia los cupos del pie y el mensaje de
-     WhatsApp. Sin el parámetro, la línea dice "1 cupo". */
+     (o el número que sea): cambia los cupos del pie y pide los datos de
+     cada persona. Sin el parámetro, la línea dice "1 cupo".
+
+     Nada de lo que se escriba aquí se guarda ni se envía a ningún lado:
+     solo compone el mensaje de WhatsApp que el invitado manda él mismo. */
   (function(){
-    var linea = document.querySelector("[data-pases]");
-    if (!linea) return;
-
     var n = parseInt(new URLSearchParams(location.search).get("pases"), 10);
-    if (!(n > 1)) return;
-    n = Math.min(n, 8);
+    n = (n > 1) ? Math.min(n, 8) : 1;
 
-    linea.textContent = n + " cupos";
+    var linea = document.querySelector("[data-pases]");
+    if (linea && n > 1) linea.textContent = n + " cupos";
 
-    var btn = document.querySelector("a.btn[data-wa]");
-    if (btn) {
-      btn.href = btn.dataset.wa + encodeURIComponent(
-        "\u00a1Hola Luciana! Confirmamos nuestra asistencia, somos " + n +
-        " personas. Nos vemos en la cena \ud83e\udd42");
+    var datos = document.querySelector("[data-datos]");
+    var btn   = document.querySelector("a.btn[data-wa]");
+    if (!datos || !btn) return;
+
+    var aviso = datos.querySelector("[data-aviso]");
+
+    /* Un bloque de campos por cupo, siempre por encima del aviso */
+    var molde = datos.querySelector(".invitado");
+    for (var i = 1; i < n; i++) {
+      datos.insertBefore(molde.cloneNode(true), aviso);
     }
+
+    var grupos = datos.querySelectorAll(".invitado");
+    grupos.forEach(function(g, j){
+      g.querySelector(".rotulo").textContent =
+        (n === 1) ? "Tus datos" : "Invitado " + (j + 1);
+    });
+
+    btn.addEventListener("click", function(e){
+      e.preventDefault();
+
+      var lineas = [], primerFallo = null;
+
+      grupos.forEach(function(g, j){
+        var campos = g.querySelectorAll(".campo");
+        var nombre = g.querySelector("[data-nombre]");
+        var cedula = g.querySelector("[data-cedula]");
+
+        campos.forEach(function(c){ c.classList.remove("falta"); });
+
+        var vn = nombre.value.trim().replace(/\s+/g, " ");
+        var vc = cedula.value.trim();
+
+        if (!vn) { nombre.closest(".campo").classList.add("falta"); primerFallo = primerFallo || nombre; }
+        if (!vc) { cedula.closest(".campo").classList.add("falta"); primerFallo = primerFallo || cedula; }
+
+        lineas.push((n > 1 ? (j + 1) + ". " : "") + vn + " — CC " + vc);
+      });
+
+      if (primerFallo) {
+        aviso.textContent = (n > 1)
+          ? "Faltan datos. Completa el nombre y la cédula de cada invitado."
+          : "Completa tu nombre y tu cédula para confirmar.";
+        aviso.hidden = false;
+        primerFallo.focus();
+        return;
+      }
+
+      aviso.hidden = true;
+
+      var saludo = (n > 1)
+        ? "\u00a1Hola Luciana! Confirmamos nuestra asistencia a la cena \ud83e\udd42"
+        : "\u00a1Hola Luciana! Confirmo mi asistencia a la cena \ud83e\udd42";
+
+      var url = btn.dataset.wa + encodeURIComponent(saludo + "\n" + lineas.join("\n"));
+      var w = window.open(url, "_blank", "noopener");
+      if (!w) location.href = url;
+    });
   })();
 </script>
 """
@@ -594,6 +698,24 @@ CTA = """  <a class="btn rise d10" href="%s%s" data-wa="%s" target="_blank" rel=
   </a>
 """
 
+DATOS = """  <div class="datos rise d9" data-datos>
+    <p class="nota">Para el listado de ingreso necesitamos el nombre completo y la
+    cédula de cada persona.</p>
+    <div class="invitado">
+      <p class="mono rotulo">Tus datos</p>
+      <label class="campo">
+        <span class="mono">Nombre completo</span>
+        <input type="text" data-nombre autocomplete="name" placeholder="Como aparece en la cédula">
+      </label>
+      <label class="campo">
+        <span class="mono">Cédula</span>
+        <input type="text" data-cedula inputmode="numeric" autocomplete="off" placeholder="Sin puntos ni comas">
+      </label>
+    </div>
+    <p class="aviso" data-aviso hidden></p>
+  </div>
+"""
+
 SOBRES = """  <p class="sobres rise d10">
     <svg class="sobre" viewBox="0 0 64 44" role="presentation" aria-hidden="true">
       <rect x="1.5" y="1.5" width="61" height="41" rx="3"/>
@@ -607,7 +729,8 @@ SIGNOFF = """  <p class="mono signoff rise d10">%s</p>
 
 # Enlaces ya repartidos con la dirección vieja. El guion conserva el ?pases;
 # la recarga por meta es el respaldo si el navegador no ejecuta guiones.
-REDIRECCION = """<title>Cena de Grado Luciana De la Rosa</title>
+REDIRECCION = """<meta charset="utf-8">
+<title>Cena de Grado Luciana De la Rosa</title>
 <link rel="canonical" href="https://luchydlr.github.io/Graduation-Luciana/cena/">
 <meta name="robots" content="noindex">
 <script>location.replace("./cena/" + location.search + location.hash);</script>
@@ -631,6 +754,7 @@ def build():
         aside = ASIDE % pg["aside"].rstrip() if pg["aside"] else ""
         cta = CTA % (WHATSAPP, pg["cta_msg"], WHATSAPP, pg["cta_texto"]) if pg["cta_texto"] else ""
         sobres = SOBRES if pg.get("sobres") else ""
+        datos  = DATOS  if pg.get("datos")  else ""
         signoff = SIGNOFF % pg["signoff"] if pg["signoff"] else ""
         html = SHELL
         for token, valor in [
@@ -644,6 +768,7 @@ def build():
             ("@@DETALLES@@",  detalles),
             ("@@MADRE@@",     madre),
             ("@@ASIDE@@",     aside),
+            ("@@DATOS@@",   datos),
             ("@@SOBRES@@",  sobres),
             ("@@CTA@@",     cta),
             ("@@SIGNOFF@@", signoff),
