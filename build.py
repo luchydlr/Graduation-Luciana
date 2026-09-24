@@ -36,7 +36,9 @@ PAGINAS = [
       <p class="mono label">A la distancia</p>
       <p class="note">Si no puedes acompañarme en persona, quiero que estés igual:
       la ceremonia se transmite en vivo y ese día también cuentas.</p>
-      <span class="btn pending">Enlace de transmisión pendiente</span>""",
+      <a class="btn" href="https://youtu.be/vLSnBxKvZio" target="_blank" rel="noopener">
+        <span class="dot"></span> Ver la transmisión
+      </a>""",
     "cta_texto": None,
     "cta_msg":   None,
     "signoff":   None,
@@ -447,12 +449,6 @@ SHELL = r"""<meta charset="utf-8">
     box-shadow: 0 0 34px -10px rgba(242,176,194,.85);
   }
   .btn .dot{ width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .btn.pending{
-    border-style: dashed;
-    border-color: rgba(223,168,140,.55);
-    color: var(--gold);
-    cursor: default;
-  }
 
   /* ── Conmigo siempre ───────────────────────────────── */
   .memoriam{
